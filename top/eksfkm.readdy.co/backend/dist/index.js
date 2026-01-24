@@ -8,7 +8,6 @@ import dotenv from 'dotenv';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import { errorHandler } from '@/middleware/errorHandler.js';
-import { authRoutes } from '@/routes/auth.js';
 import { userRoutes } from '@/routes/users.js';
 import { contactRoutes } from '@/routes/contact.js';
 import { donationRoutes } from '@/routes/donations.js';
@@ -17,7 +16,7 @@ import { healthRoutes } from '@/routes/health.js';
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
+const FRONTEND_URL = process.env.FRONTEND_URL || 'https://your-app.netlify.app';
 // Rate limiting
 const limiter = rateLimit({
     windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000'), // 15 minutes
@@ -33,9 +32,10 @@ app.use(helmet({
 app.use(compression());
 app.use(morgan('combined'));
 app.use(limiter);
-// CORS configuration
+// CORS configuration - locked to Netlify domain
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [FRONTEND_URL];
 app.use(cors({
-    origin: [FRONTEND_URL, 'http://localhost:5173', 'http://localhost:3000'],
+    origin: allowedOrigins,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
@@ -47,12 +47,12 @@ const swaggerOptions = {
     definition: {
         openapi: '3.0.0',
         info: {
-            title: 'EAKSFM Readdy API',
+            title: 'Educate an Orphan Uganda API',
             version: '1.0.0',
-            description: 'Backend API for eksfkm.readdy.co',
+            description: 'Backend API for Educate an Orphan Uganda NGO',
             contact: {
                 name: 'API Support',
-                email: 'support@eksfkm.readdy.co',
+                email: 'support@educateanorphantuganda.org',
             },
         },
         servers: [
@@ -78,7 +78,6 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 // Health check
 app.use('/api/health', healthRoutes);
 // API routes
-app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/donations', donationRoutes);
@@ -86,7 +85,7 @@ app.use('/api/analytics', analyticsRoutes);
 // Root endpoint
 app.get('/', (req, res) => {
     res.json({
-        message: 'EAKSFM Readdy API is running!',
+        message: 'Educate an Orphan Uganda API is running!',
         version: '1.0.0',
         documentation: '/api-docs',
         health: '/api/health',

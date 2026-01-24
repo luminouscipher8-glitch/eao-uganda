@@ -114,7 +114,7 @@ export class UserController {
         }
         // Delete user profile (Supabase handles auth user deletion)
         await db.prisma.userProfile.delete({
-            where: { userId: targetUserId },
+            where: { userId: targetUserId || '' },
         });
         const response = {
             success: true,
