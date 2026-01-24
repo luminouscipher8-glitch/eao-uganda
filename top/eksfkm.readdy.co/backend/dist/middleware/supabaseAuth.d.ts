@@ -1,5 +1,5 @@
 import { Response, NextFunction } from 'express';
-import { AuthenticatedRequest } from '@/types/index.js';
+import { AuthenticatedRequest } from '../types/index.js';
 export declare class SupabaseAuth {
     private static readonly SUPABASE_JWT_SECRET;
     private static readonly SUPABASE_URL;

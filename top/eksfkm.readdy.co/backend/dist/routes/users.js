@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import { body } from 'express-validator';
-import { UserController } from '@/controllers/userController.js';
-import { SupabaseAuth } from '@/middleware/supabaseAuth.js';
-import { asyncHandler } from '@/middleware/errorHandler.js';
+import { UserController } from '../controllers/userController.js';
+import { SupabaseAuth } from '../middleware/supabaseAuth.js';
+import { asyncHandler } from '../middleware/errorHandler.js';
 const router = Router();
 const userController = new UserController();
 // Validation middleware
