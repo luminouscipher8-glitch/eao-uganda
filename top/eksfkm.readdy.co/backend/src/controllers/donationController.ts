@@ -112,7 +112,7 @@ export class DonationController {
     const userId = SupabaseAuth.extractUserId(req);
 
     const donation = await db.prisma.donation.findUnique({
-      where: { id },
+      where: { id: id || '' },
       include: {
         user: {
           select: {
@@ -160,7 +160,7 @@ export class DonationController {
     const { donations, total, pages, hasNext, hasPrev } = await db.getDonations({
       page,
       limit,
-      userId: targetUserId,
+      userId: targetUserId || undefined,
     });
 
     const response: ApiResponse = {
@@ -191,7 +191,7 @@ export class DonationController {
 
     const [donations, total] = await Promise.all([
       db.prisma.donation.findMany({
-        where: { campaignId },
+        where: { campaignId: campaignId || undefined },
         skip: (page - 1) * limit,
         take: limit,
         orderBy: { createdAt: 'desc' },
@@ -204,7 +204,7 @@ export class DonationController {
           },
         },
       }),
-      db.prisma.donation.count({ where: { campaignId } }),
+      db.prisma.donation.count({ where: { campaignId: campaignId || undefined } }),
     ]);
 
     const response: ApiResponse = {

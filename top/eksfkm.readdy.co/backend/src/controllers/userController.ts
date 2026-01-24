@@ -23,7 +23,7 @@ export class UserController {
         userId,
         role: 'USER',
         isActive: true,
-      });
+      }) as any;
     }
 
     const response: ApiResponse = {
@@ -138,7 +138,7 @@ export class UserController {
 
     // Delete user profile (Supabase handles auth user deletion)
     await db.prisma.userProfile.delete({
-      where: { userId: targetUserId },
+      where: { userId: targetUserId || '' },
     });
 
     const response: ApiResponse = {
