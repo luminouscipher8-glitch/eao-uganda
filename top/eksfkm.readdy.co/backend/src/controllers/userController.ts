@@ -48,7 +48,7 @@ export class UserController {
 
     // Check if username is taken (if being updated)
     if (username) {
-      const existingProfile = await db.prisma.userProfile.findFirst({
+      const existingProfile = await (db.prisma as any).userProfile.findFirst({
         where: {
           username,
           userId: { not: userId },
@@ -85,7 +85,7 @@ export class UserController {
     const limit = parseInt(req.query.limit as string) || 10;
 
     const [users, total] = await Promise.all([
-      db.prisma.userProfile.findMany({
+      (db.prisma as any).userProfile.findMany({
         skip: (page - 1) * limit,
         take: limit,
         include: {
@@ -99,7 +99,7 @@ export class UserController {
         },
         orderBy: { createdAt: 'desc' },
       }),
-      db.prisma.userProfile.count(),
+      (db.prisma as any).userProfile.count(),
     ]);
 
     const response: ApiResponse = {
@@ -137,7 +137,7 @@ export class UserController {
     }
 
     // Delete user profile (Supabase handles auth user deletion)
-    await db.prisma.userProfile.delete({
+    await (db.prisma as any).userProfile.delete({
       where: { userId: targetUserId || '' },
     });
 
