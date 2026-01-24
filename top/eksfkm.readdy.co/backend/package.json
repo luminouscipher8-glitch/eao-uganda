@@ -10,7 +10,7 @@
     "start": "node dist/index.js",
     "test": "vitest",
     "test:watch": "vitest --watch",
-    "db:generate": "prisma generate",
+    "db:generate": "node ./node_modules/prisma/build/index.js generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
