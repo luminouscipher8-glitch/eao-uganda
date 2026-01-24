@@ -1,0 +1,18 @@
+{
+  "name": "eao-uganda-backend",
+  "version": "1.0.0",
+  "description": "Educate an Orphan Uganda - Backend API",
+  "main": "eksfkm.readdy.co/backend/src/index.js",
+  "scripts": {
+    "start": "cd eksfkm.readdy.co/backend && npm start",
+    "build": "cd eksfkm.readdy.co/backend && npm install && npx prisma generate",
+    "dev": "cd eksfkm.readdy.co/backend && npm run dev",
+    "test": "cd eksfkm.readdy.co/backend && npm test"
+  },
+  "keywords": ["ngo", "education", "uganda", "supabase", "flutterwave"],
+  "author": "Educate an Orphan Uganda",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
