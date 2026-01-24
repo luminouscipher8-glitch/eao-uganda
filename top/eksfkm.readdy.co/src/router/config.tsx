@@ -10,6 +10,7 @@ const GetInvolvedPage = lazy(() => import('../pages/get-involved/page'));
 const DonatePage = lazy(() => import('../pages/donate/page'));
 const ContactPage = lazy(() => import('../pages/contact/page'));
 const StockGiftsPage = lazy(() => import('../pages/stock-gifts/page'));
+const PartnersPage = lazy(() => import('../pages/partners/page'));
 
 // Route metadata for SEO and analytics
 const routeMeta: Record<string, { title: string; description: string }> = {
@@ -20,6 +21,7 @@ const routeMeta: Record<string, { title: string; description: string }> = {
   '/donate': { title: 'Donate | Educate an Orphan Uganda', description: 'Support children\'s education in Uganda' },
   '/contact': { title: 'Contact | Educate an Orphan Uganda', description: 'Get in touch with us' },
   '/stock-gifts': { title: 'Stock Gifts | Educate an Orphan Uganda', description: 'Donate stocks and securities' },
+  '/partners': { title: 'Partners | Educate an Orphan Uganda', description: 'Meet our valued partners and sponsors' },
 };
 
 const createRoute = (path: string, element: React.ComponentType): RouteObject => ({
@@ -39,6 +41,7 @@ const routes: RouteObject[] = [
   createRoute('/donate', DonatePage),
   createRoute('/contact', ContactPage),
   createRoute('/stock-gifts', StockGiftsPage),
+  createRoute('/partners', PartnersPage),
 ];
 
 export { routeMeta };
