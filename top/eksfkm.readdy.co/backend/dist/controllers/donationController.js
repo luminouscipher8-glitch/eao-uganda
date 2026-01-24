@@ -157,7 +157,7 @@ export class DonationController {
         const limit = parseInt(req.query.limit) || 10;
         const [donations, total] = await Promise.all([
             db.prisma.donation.findMany({
-                where: campaignId ? { campaignId: { equals: campaignId } } : {},
+                where: campaignId ? { campaignId: campaignId } : {},
                 skip: (page - 1) * limit,
                 take: limit,
                 orderBy: { createdAt: 'desc' },
@@ -170,7 +170,7 @@ export class DonationController {
                     },
                 },
             }),
-            db.prisma.donation.count({ where: campaignId ? { campaignId: { equals: campaignId } } : {} }),
+            db.prisma.donation.count({ where: campaignId ? { campaignId: campaignId } : {} }),
         ]);
         const response = {
             success: true,
