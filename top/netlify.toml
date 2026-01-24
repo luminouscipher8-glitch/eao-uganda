@@ -19,7 +19,7 @@
 # API proxy to backend (Render)
 [[redirects]]
   from = "/api/*"
-  to = "https://your-backend-url.onrender.com/api/:splat"
+  to = "https://eao-uganda.onrender.com/api/:splat"
   status = 200
   force = true
 
@@ -34,7 +34,7 @@
       style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
       font-src 'self' https://fonts.gstatic.com;
       img-src 'self' data: https: blob:;
-      connect-src 'self' https://api.supabase.co https://your-backend-url.onrender.com https://www.google-analytics.com;
+      connect-src 'self' https://api.supabase.co https://eao-uganda.onrender.com https://www.google-analytics.com;
       frame-src 'none';
       object-src 'none';
       base-uri 'self';
@@ -115,12 +115,12 @@
 [context.production.environment]
   VITE_SUPABASE_URL = ""
   VITE_SUPABASE_ANON_KEY = ""
-  VITE_API_URL = "https://your-backend-url.onrender.com"
+  VITE_API_URL = "https://eao-uganda.onrender.com"
 
 [context.deploy-preview.environment]
   VITE_SUPABASE_URL = ""
   VITE_SUPABASE_ANON_KEY = ""
-  VITE_API_URL = "https://your-backend-url.onrender.com"
+  VITE_API_URL = "https://eao-uganda.onrender.com"
 
 # Edge functions for better performance
 [[edge_functions]]
