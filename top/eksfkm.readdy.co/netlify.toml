@@ -2,6 +2,7 @@
 # Production-ready NGO web platform
 
 [build]
+  base = "top/eksfkm.readdy.co"
   publish = "dist"
   command = "npm run build"
 
