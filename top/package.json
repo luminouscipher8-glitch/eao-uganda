@@ -5,7 +5,7 @@
   "main": "eksfkm.readdy.co/backend/src/index.js",
   "scripts": {
     "start": "cd eksfkm.readdy.co/backend && npm start",
-    "build": "cd eksfkm.readdy.co/backend && npm install && npx prisma generate",
+    "build": "cd eksfkm.readdy.co/backend && npm install && npm run db:generate && npm run build",
     "dev": "cd eksfkm.readdy.co/backend && npm run dev",
     "test": "cd eksfkm.readdy.co/backend && npm test"
   },
