@@ -1,0 +1,161 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Reference Supabase auth.users table for user relationships
+model auth_users {
+  // Supabase manages this table - we only reference it
+  id            String   @id
+  email         String
+  phone         String?
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+  
+  // Relations to our custom tables
+  profiles      UserProfile?
+  contacts      Contact[]
+  donations     Donation[]
+  analytics     AnalyticsEvent[]
+
+  @@map("users")
+}
+
+// Extended user profile data (additional fields beyond Supabase auth)
+model UserProfile {
+  id          String   @id @default(cuid())
+  userId      String   @unique // Foreign key to auth.users.id
+  username    String?  @unique
+  firstName   String?
+  lastName    String?
+  avatar      String?
+  bio         String?
+  role        Role     @default(USER)
+  isActive    Boolean  @default(true)
+  lastLoginAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relation to Supabase auth users
+  authUser    auth_users @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_profiles")
+}
+
+model Contact {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  subject   String
+  message   String
+  phone     String?
+  company   String?
+  status    ContactStatus @default(PENDING)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  userId String?
+  user   auth_users? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("contacts")
+}
+
+model Donation {
+  id                    String           @id @default(cuid())
+  amount                Float
+  currency              String           @default("UGX") // Uganda Shillings
+  flutterwaveTxRef      String           @unique
+  flutterwaveTransactionId String?
+  status                DonationStatus   @default(PENDING)
+  message               String?
+  isAnonymous           Boolean          @default(false)
+  donorName             String?          // For anonymous donations
+  donorEmail            String?          // For anonymous donations
+  paymentMethod         String?          // mobile_money, card, etc.
+  createdAt             DateTime         @default(now())
+  updatedAt             DateTime         @updatedAt
+
+  // Relations
+  userId String?
+  user   auth_users? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  campaignId String?
+  campaign   Campaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+
+  @@map("donations")
+}
+
+model AnalyticsEvent {
+  id        String   @id @default(cuid())
+  userId    String?
+  eventName String
+  eventData Json?
+  sessionId String?
+  ipAddress String?
+  userAgent String?
+  referrer  String?
+  createdAt DateTime @default(now())
+
+  // Relations
+  user auth_users? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("analytics_events")
+}
+
+model Newsletter {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  isActive  Boolean  @default(true)
+  source    String?  // Where the subscription came from
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("newsletters")
+}
+
+model Campaign {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  goalAmount  Float
+  currentAmount Float @default(0)
+  currency    String @default("UGX")
+  startDate   DateTime
+  endDate     DateTime
+  isActive    Boolean @default(true)
+  imageUrl    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  donations Donation[]
+
+  @@map("campaigns")
+}
+
+enum Role {
+  USER
+  ADMIN
+  MODERATOR
+}
+
+enum ContactStatus {
+  PENDING
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum DonationStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}

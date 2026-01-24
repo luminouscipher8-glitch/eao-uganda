@@ -1,0 +1,204 @@
+import {j as e, L as m} from "./index-CWbBFHrl.js";
+function i() {
+    const a = [{
+        name: "Partner 1",
+        logo: "https://via.placeholder.com/200x100/0d9488/ffffff?text=Platinum+Partner"
+    }, {
+        name: "Partner 2",
+        logo: "https://via.placeholder.com/200x100/0d9488/ffffff?text=Platinum+Partner"
+    }]
+      , r = [{
+        name: "Partner 3",
+        logo: "https://via.placeholder.com/180x90/f59e0b/ffffff?text=Gold+Partner"
+    }, {
+        name: "Partner 4",
+        logo: "https://via.placeholder.com/180x90/f59e0b/ffffff?text=Gold+Partner"
+    }, {
+        name: "Partner 5",
+        logo: "https://via.placeholder.com/180x90/f59e0b/ffffff?text=Gold+Partner"
+    }]
+      , l = [{
+        name: "Partner 6",
+        logo: "https://via.placeholder.com/160x80/6b7280/ffffff?text=Silver+Partner"
+    }, {
+        name: "Partner 7",
+        logo: "https://via.placeholder.com/160x80/6b7280/ffffff?text=Silver+Partner"
+    }, {
+        name: "Partner 8",
+        logo: "https://via.placeholder.com/160x80/6b7280/ffffff?text=Silver+Partner"
+    }, {
+        name: "Partner 9",
+        logo: "https://via.placeholder.com/160x80/6b7280/ffffff?text=Silver+Partner"
+    }];
+    return e.jsxs("div", {
+        className: "min-h-screen bg-white",
+        children: [e.jsx("section", {
+            className: "py-16 sm:py-20 md:py-24 px-4 sm:px-6 bg-white",
+            children: e.jsxs("div", {
+                className: "max-w-4xl mx-auto text-center",
+                children: [e.jsx("h1", {
+                    className: "text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 mb-4 sm:mb-6",
+                    children: "Our Partners in Impact"
+                }), e.jsx("p", {
+                    className: "text-base sm:text-lg md:text-xl text-gray-700 leading-relaxed mb-6 sm:mb-8",
+                    children: "We are deeply grateful to our partners and sponsors who share our vision of transforming lives through education. Together, we are building a brighter future for Uganda's children."
+                }), e.jsx("div", {
+                    className: "w-24 sm:w-32 h-0.5 bg-teal-600 mx-auto"
+                })]
+            })
+        }), e.jsx("section", {
+            className: "py-16 sm:py-20 md:py-24 px-4 sm:px-6 bg-gray-50",
+            children: e.jsxs("div", {
+                className: "max-w-7xl mx-auto",
+                children: [e.jsxs("div", {
+                    className: "mb-16 sm:mb-20",
+                    children: [e.jsxs("div", {
+                        className: "flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-8 sm:mb-12",
+                        children: [e.jsx("div", {
+                            className: "px-4 sm:px-6 py-1.5 sm:py-2 bg-teal-600 text-white text-sm sm:text-base font-bold rounded-full whitespace-nowrap",
+                            children: "Platinum Partners"
+                        }), e.jsx("div", {
+                            className: "flex-1 h-px bg-gray-300 w-full"
+                        })]
+                    }), e.jsx("div", {
+                        className: "grid sm:grid-cols-2 gap-6 sm:gap-8 max-w-4xl mx-auto",
+                        children: a.map( (s, t) => e.jsx("div", {
+                            className: "aspect-[2/1] bg-white rounded-xl sm:rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 flex items-center justify-center p-6 sm:p-8 cursor-pointer",
+                            children: e.jsx("img", {
+                                src: s.logo,
+                                alt: s.name,
+                                className: "max-w-full max-h-full object-contain grayscale hover:grayscale-0 transition-all duration-300"
+                            })
+                        }, t))
+                    })]
+                }), e.jsxs("div", {
+                    className: "mb-16 sm:mb-20",
+                    children: [e.jsxs("div", {
+                        className: "flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-8 sm:mb-12",
+                        children: [e.jsx("div", {
+                            className: "px-4 sm:px-6 py-1.5 sm:py-2 bg-amber-500 text-white text-sm sm:text-base font-bold rounded-full whitespace-nowrap",
+                            children: "Gold Partners"
+                        }), e.jsx("div", {
+                            className: "flex-1 h-px bg-gray-300 w-full"
+                        })]
+                    }), e.jsx("div", {
+                        className: "grid sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8",
+                        children: r.map( (s, t) => e.jsx("div", {
+                            className: "aspect-[2/1] bg-white rounded-xl sm:rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 flex items-center justify-center p-6 sm:p-8 cursor-pointer",
+                            children: e.jsx("img", {
+                                src: s.logo,
+                                alt: s.name,
+                                className: "max-w-full max-h-full object-contain grayscale hover:grayscale-0 transition-all duration-300"
+                            })
+                        }, t))
+                    })]
+                }), e.jsxs("div", {
+                    children: [e.jsxs("div", {
+                        className: "flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-8 sm:mb-12",
+                        children: [e.jsx("div", {
+                            className: "px-4 sm:px-6 py-1.5 sm:py-2 bg-gray-500 text-white text-sm sm:text-base font-bold rounded-full whitespace-nowrap",
+                            children: "Silver Partners"
+                        }), e.jsx("div", {
+                            className: "flex-1 h-px bg-gray-300 w-full"
+                        })]
+                    }), e.jsx("div", {
+                        className: "grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8",
+                        children: l.map( (s, t) => e.jsx("div", {
+                            className: "aspect-square bg-white rounded-xl sm:rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 flex items-center justify-center p-4 sm:p-6 cursor-pointer",
+                            children: e.jsx("img", {
+                                src: s.logo,
+                                alt: s.name,
+                                className: "max-w-full max-h-full object-contain grayscale hover:grayscale-0 transition-all duration-300"
+                            })
+                        }, t))
+                    })]
+                })]
+            })
+        }), e.jsx("section", {
+            className: "py-16 sm:py-20 md:py-24 px-4 sm:px-6 bg-gradient-to-br from-teal-600 to-teal-700",
+            children: e.jsxs("div", {
+                className: "max-w-4xl mx-auto text-center",
+                children: [e.jsx("h2", {
+                    className: "text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 sm:mb-6",
+                    children: "Partner With Us"
+                }), e.jsx("p", {
+                    className: "text-base sm:text-lg md:text-xl text-teal-100 mb-8 sm:mb-12 leading-relaxed",
+                    children: "Join our network of committed partners making a lasting difference in children's education. Together, we can achieve more and create sustainable impact across Uganda."
+                }), e.jsxs("div", {
+                    className: "flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center",
+                    children: [e.jsx("a", {
+                        href: "#",
+                        className: "w-full sm:w-auto px-8 sm:px-10 py-4 sm:py-5 bg-white text-teal-700 text-base sm:text-lg font-semibold rounded-full hover:bg-amber-500 hover:text-white transition-all duration-300 shadow-lg hover:scale-105 whitespace-nowrap cursor-pointer text-center",
+                        children: "Download Partnership Prospectus"
+                    }), e.jsx(m, {
+                        to: "/contact",
+                        className: "w-full sm:w-auto px-8 sm:px-10 py-4 sm:py-5 bg-transparent border-2 border-white text-white text-base sm:text-lg font-semibold rounded-full hover:bg-white hover:text-teal-700 transition-all duration-300 whitespace-nowrap cursor-pointer text-center",
+                        children: "Contact Us"
+                    })]
+                })]
+            })
+        }), e.jsx("section", {
+            className: "py-16 sm:py-20 md:py-24 px-4 sm:px-6 bg-white",
+            children: e.jsxs("div", {
+                className: "max-w-7xl mx-auto",
+                children: [e.jsxs("div", {
+                    className: "text-center mb-12 sm:mb-16",
+                    children: [e.jsx("h2", {
+                        className: "text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 sm:mb-6",
+                        children: "Partnership Benefits"
+                    }), e.jsx("p", {
+                        className: "text-base sm:text-lg md:text-xl text-gray-600 max-w-3xl mx-auto",
+                        children: "When you partner with us, you gain more than just brand visibility"
+                    })]
+                }), e.jsxs("div", {
+                    className: "grid md:grid-cols-3 gap-6 sm:gap-8",
+                    children: [e.jsxs("div", {
+                        className: "bg-teal-50 rounded-xl sm:rounded-2xl p-6 sm:p-8 border-2 border-teal-200",
+                        children: [e.jsx("div", {
+                            className: "w-14 h-14 sm:w-16 sm:h-16 bg-teal-600 rounded-full flex items-center justify-center mb-4 sm:mb-6",
+                            children: e.jsx("i", {
+                                className: "ri-heart-line text-2xl sm:text-3xl text-white"
+                            })
+                        }), e.jsx("h3", {
+                            className: "text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4",
+                            children: "Meaningful Impact"
+                        }), e.jsx("p", {
+                            className: "text-sm sm:text-base text-gray-700 leading-relaxed",
+                            children: "Your partnership directly transforms children's lives through education, creating measurable and lasting change in communities."
+                        })]
+                    }), e.jsxs("div", {
+                        className: "bg-amber-50 rounded-xl sm:rounded-2xl p-6 sm:p-8 border-2 border-amber-200",
+                        children: [e.jsx("div", {
+                            className: "w-14 h-14 sm:w-16 sm:h-16 bg-amber-500 rounded-full flex items-center justify-center mb-4 sm:mb-6",
+                            children: e.jsx("i", {
+                                className: "ri-team-line text-2xl sm:text-3xl text-white"
+                            })
+                        }), e.jsx("h3", {
+                            className: "text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4",
+                            children: "Brand Alignment"
+                        }), e.jsx("p", {
+                            className: "text-sm sm:text-base text-gray-700 leading-relaxed",
+                            children: "Associate your brand with a trusted NGO committed to transparency, integrity, and proven impact in education."
+                        })]
+                    }), e.jsxs("div", {
+                        className: "bg-gray-50 rounded-xl sm:rounded-2xl p-6 sm:p-8 border-2 border-gray-200",
+                        children: [e.jsx("div", {
+                            className: "w-14 h-14 sm:w-16 sm:h-16 bg-gray-700 rounded-full flex items-center justify-center mb-4 sm:mb-6",
+                            children: e.jsx("i", {
+                                className: "ri-trophy-line text-2xl sm:text-3xl text-white"
+                            })
+                        }), e.jsx("h3", {
+                            className: "text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4",
+                            children: "Recognition"
+                        }), e.jsx("p", {
+                            className: "text-sm sm:text-base text-gray-700 leading-relaxed",
+                            children: "Receive prominent recognition across our platforms, events, and communications reaching thousands of supporters."
+                        })]
+                    })]
+                })]
+            })
+        })]
+    })
+}
+export {i as default};
+//# sourceMappingURL=page-CgQpEobB.js.map

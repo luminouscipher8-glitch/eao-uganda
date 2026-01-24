@@ -1,0 +1,15 @@
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://educateanorphan.org/sitemap.xml
+
+# Block common non-content paths
+Disallow: /api/
+Disallow: /admin/
+Disallow: /*.json$
+Disallow: /src/
+Disallow: /node_modules/
+
+# Crawl-delay for respectful crawling
+Crawl-delay: 1
