@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { AuthenticatedRequest, ApiResponse } from '@/types/index.js';
+import { AuthenticatedRequest, ApiResponse } from '../types/index.js';
 
 // Supabase JWT verification
 export class SupabaseAuth {

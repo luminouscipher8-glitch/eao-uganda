@@ -1,6 +1,6 @@
-import { db } from '@/utils/database.js';
-import { SupabaseAuth } from '@/middleware/supabaseAuth.js';
-import { AppError, asyncHandler } from '@/middleware/errorHandler.js';
+import { db } from '../utils/database.js';
+import { SupabaseAuth } from '../middleware/supabaseAuth.js';
+import { AppError, asyncHandler } from '../middleware/errorHandler.js';
 export class UserController {
     /**
      * Get current user profile

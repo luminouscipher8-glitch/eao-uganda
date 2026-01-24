@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import { db } from '@/utils/database.js';
-import { SupabaseAuth } from '@/middleware/supabaseAuth.js';
-import { AppError, asyncHandler } from '@/middleware/errorHandler.js';
-import { AuthenticatedRequest, ApiResponse } from '@/types/index.js';
+import { db } from '../utils/database.js';
+import { SupabaseAuth } from '../middleware/supabaseAuth.js';
+import { AppError, asyncHandler } from '../middleware/errorHandler.js';
+import { AuthenticatedRequest, ApiResponse } from '../types/index.js';
 
 export class UserController {
   /**

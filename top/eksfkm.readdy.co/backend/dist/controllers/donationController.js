@@ -1,7 +1,7 @@
 import crypto from 'crypto';
-import { db } from '@/utils/database.js';
-import { SupabaseAuth } from '@/middleware/supabaseAuth.js';
-import { AppError, asyncHandler } from '@/middleware/errorHandler.js';
+import { db } from '../utils/database.js';
+import { SupabaseAuth } from '../middleware/supabaseAuth.js';
+import { AppError, asyncHandler } from '../middleware/errorHandler.js';
 export class DonationController {
     /**
      * Create a donation payment intent with Flutterwave

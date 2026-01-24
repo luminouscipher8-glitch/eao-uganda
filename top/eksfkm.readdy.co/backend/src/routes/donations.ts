@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import { body } from 'express-validator';
-import { DonationController } from '@/controllers/donationController.js';
-import { SupabaseAuth } from '@/middleware/supabaseAuth.js';
-import { asyncHandler } from '@/middleware/errorHandler.js';
+import { DonationController } from '../controllers/donationController.js';
+import { SupabaseAuth } from '../middleware/supabaseAuth.js';
+import { asyncHandler } from '../middleware/errorHandler.js';
 
 const router = Router();
 const donationController = new DonationController();

@@ -8,13 +8,13 @@ import dotenv from 'dotenv';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
-import { errorHandler } from '@/middleware/errorHandler.js';
-import { SupabaseAuth } from '@/middleware/supabaseAuth.js';
-import { userRoutes } from '@/routes/users.js';
-import { contactRoutes } from '@/routes/contact.js';
-import { donationRoutes } from '@/routes/donations.js';
-import { analyticsRoutes } from '@/routes/analytics.js';
-import { healthRoutes } from '@/routes/health.js';
+import { errorHandler } from './middleware/errorHandler.js';
+import { SupabaseAuth } from './middleware/supabaseAuth.js';
+import { userRoutes } from './routes/users.js';
+import { contactRoutes } from './routes/contact.js';
+import { donationRoutes } from './routes/donations.js';
+import { analyticsRoutes } from './routes/analytics.js';
+import { healthRoutes } from './routes/health.js';
 
 dotenv.config();
 
