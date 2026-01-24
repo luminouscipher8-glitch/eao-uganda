@@ -2,9 +2,9 @@
 # Production-ready NGO web platform
 
 [build]
-  base = "top/eksfkm.readdy.co"
-  publish = "dist"
-  command = "npm run build"
+  base = ""
+  publish = "top/eksfkm.readdy.co/dist"
+  command = "cd top/eksfkm.readdy.co && npm run build"
 
 [build.environment]
   NODE_VERSION = "18"
