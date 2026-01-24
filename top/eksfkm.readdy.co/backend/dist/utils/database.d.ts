@@ -71,7 +71,6 @@ export declare const db: {
             email: string;
         } | null;
     } & {
-        message: string;
         id: string;
         userId: string | null;
         createdAt: Date;
@@ -80,6 +79,7 @@ export declare const db: {
         phone: string | null;
         name: string;
         subject: string;
+        message: string;
         company: string | null;
         status: import(".prisma/client").$Enums.ContactStatus;
     }>;
@@ -94,7 +94,6 @@ export declare const db: {
                 email: string;
             } | null;
         } & {
-            message: string;
             id: string;
             userId: string | null;
             createdAt: Date;
@@ -103,6 +102,7 @@ export declare const db: {
             phone: string | null;
             name: string;
             subject: string;
+            message: string;
             company: string | null;
             status: import(".prisma/client").$Enums.ContactStatus;
         })[];
@@ -117,11 +117,11 @@ export declare const db: {
             email: string;
         } | null;
     } & {
-        message: string | null;
         id: string;
         userId: string | null;
         createdAt: Date;
         updatedAt: Date;
+        message: string | null;
         status: import(".prisma/client").$Enums.DonationStatus;
         amount: number;
         currency: string;
@@ -139,11 +139,11 @@ export declare const db: {
             email: string;
         } | null;
     } & {
-        message: string | null;
         id: string;
         userId: string | null;
         createdAt: Date;
         updatedAt: Date;
+        message: string | null;
         status: import(".prisma/client").$Enums.DonationStatus;
         amount: number;
         currency: string;
@@ -166,11 +166,11 @@ export declare const db: {
                 email: string;
             } | null;
         } & {
-            message: string | null;
             id: string;
             userId: string | null;
             createdAt: Date;
             updatedAt: Date;
+            message: string | null;
             status: import(".prisma/client").$Enums.DonationStatus;
             amount: number;
             currency: string;
@@ -295,11 +295,11 @@ export declare const db: {
     }>;
     getCampaignById(id: string): Promise<({
         donations: {
-            message: string | null;
             id: string;
             userId: string | null;
             createdAt: Date;
             updatedAt: Date;
+            message: string | null;
             status: import(".prisma/client").$Enums.DonationStatus;
             amount: number;
             currency: string;

@@ -120,12 +120,6 @@ export class DonationController {
             email: true,
           },
         },
-        campaign: {
-          select: {
-            id: true,
-            title: true,
-          },
-        },
       },
     });
 
@@ -160,7 +154,7 @@ export class DonationController {
     const { donations, total, pages, hasNext, hasPrev } = await db.getDonations({
       page,
       limit,
-      userId: targetUserId || undefined,
+      ...(targetUserId && { userId: targetUserId }),
     });
 
     const response: ApiResponse = {
@@ -191,7 +185,7 @@ export class DonationController {
 
     const [donations, total] = await Promise.all([
       db.prisma.donation.findMany({
-        where: { campaignId: campaignId || undefined },
+        where: campaignId ? { campaignId: { equals: campaignId } } : {},
         skip: (page - 1) * limit,
         take: limit,
         orderBy: { createdAt: 'desc' },
@@ -204,7 +198,7 @@ export class DonationController {
           },
         },
       }),
-      db.prisma.donation.count({ where: { campaignId: campaignId || undefined } }),
+      db.prisma.donation.count({ where: campaignId ? { campaignId: { equals: campaignId } } : {} }),
     ]);
 
     const response: ApiResponse = {
