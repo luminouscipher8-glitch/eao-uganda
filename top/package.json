@@ -1,6 +1,6 @@
 {
   "name": "eao-uganda-backend",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Educate an Orphan Uganda - Backend API",
   "main": "eksfkm.readdy.co/backend/src/index.js",
   "scripts": {
