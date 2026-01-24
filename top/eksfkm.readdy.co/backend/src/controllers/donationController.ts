@@ -185,7 +185,7 @@ export class DonationController {
 
     const [donations, total] = await Promise.all([
       db.prisma.donation.findMany({
-        where: campaignId ? { campaignId: { equals: campaignId } } : {},
+        where: campaignId ? { campaignId: campaignId } as any : {},
         skip: (page - 1) * limit,
         take: limit,
         orderBy: { createdAt: 'desc' },
@@ -198,7 +198,7 @@ export class DonationController {
           },
         },
       }),
-      db.prisma.donation.count({ where: campaignId ? { campaignId: { equals: campaignId } } : {} }),
+      db.prisma.donation.count({ where: campaignId ? { campaignId: campaignId } as any : {} }),
     ]);
 
     const response: ApiResponse = {
