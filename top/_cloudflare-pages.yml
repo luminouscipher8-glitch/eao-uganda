@@ -1,0 +1,88 @@
+# Cloudflare Pages Configuration for Educate an Orphan Uganda
+# Production-ready NGO web platform
+
+name: eao-uganda
+production_branch: main
+
+# Build configuration
+build:
+  command: "cd top/eksfkm.readdy.co && npm run build"
+  cwd: "top/eksfkm.readdy.co"
+  destination_dir: "dist"
+
+# Environment variables
+env:
+  production:
+    VITE_SUPABASE_URL: "https://db.rogxpucnkqwbeohpkolj.supabase.co"
+    VITE_SUPABASE_ANON_KEY: "sb_publishable_5707Wm_xn45TSDx1haQyqg_hs71FryT"
+    VITE_API_URL: "https://eao-uganda.onrender.com"
+  
+  preview:
+    VITE_SUPABASE_URL: "https://db.rogxpucnkqwbeohpkolj.supabase.co"
+    VITE_SUPABASE_ANON_KEY: "sb_publishable_5707Wm_xn45TSDx1haQyqg_hs71FryT"
+    VITE_API_URL: "https://eao-uganda.onrender.com"
+
+# Node.js version
+node_version: "18"
+
+# Custom headers for security and caching
+headers:
+  - for: "/*"
+    values:
+      X-Frame-Options: "DENY"
+      X-Content-Type-Options: "nosniff"
+      X-XSS-Protection: "1; mode=block"
+      Referrer-Policy: "strict-origin-when-cross-origin"
+      Permissions-Policy: "geolocation=(), microphone=(), camera=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=(), autoplay=(), encrypted-media=(), fullscreen=(), picture-in-picture=()"
+      Cache-Control: "public, max-age=31536000, immutable"
+  
+  - for: "/index.html"
+    values:
+      Cache-Control: "no-cache, no-store, must-revalidate"
+      Pragma: "no-cache"
+      Expires: "0"
+  
+  - for: "/assets/*"
+    values:
+      Cache-Control: "public, max-age=31536000, immutable"
+  
+  - for: "/*.js"
+    values:
+      Cache-Control: "public, max-age=31536000, immutable"
+  
+  - for: "/*.css"
+    values:
+      Cache-Control: "public, max-age=31536000, immutable"
+  
+  - for: "/*.png"
+    values:
+      Cache-Control: "public, max-age=31536000, immutable"
+  
+  - for: "/*.jpg"
+    values:
+      Cache-Control: "public, max-age=31536000, immutable"
+  
+  - for: "/*.svg"
+    values:
+      Cache-Control: "public, max-age=31536000, immutable"
+  
+  - for: "/*.ico"
+    values:
+      Cache-Control: "public, max-age=31536000, immutable"
+
+# Redirects for SPA routing and API proxy
+redirects:
+  # API proxy to backend (Render) - MUST come first!
+  - from: "/api/*"
+    to: "https://eao-uganda.onrender.com/api/:splat"
+    status: 200
+  
+  # SPA routing - MUST come after API proxy
+  - from: "/*"
+    to: "/index.html"
+    status: 200
+
+# Page Functions (if needed)
+functions:
+  - pattern: "api/*"
+    runtime: "nodejs_compat"
