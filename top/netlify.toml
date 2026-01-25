@@ -2,9 +2,9 @@
 # Production-ready NGO web platform
 
 [build]
-  base = ""
-  publish = "top/eksfkm.readdy.co/dist"
-  command = "cd top/eksfkm.readdy.co && npm run build"
+  base = "top/eksfkm.readdy.co"
+  publish = "dist"
+  command = "npm run build"
 
 [build.environment]
   NODE_VERSION = "18"
@@ -87,13 +87,13 @@
 
 # Environment variables for production
 [context.production.environment]
-  VITE_SUPABASE_URL = ""
-  VITE_SUPABASE_ANON_KEY = ""
+  VITE_SUPABASE_URL = "https://db.rogxpucnkqwbeohpkolj.supabase.co"
+  VITE_SUPABASE_ANON_KEY = "sb_publishable_5707Wm_xn45TSDx1haQyqg_hs71FryT"
   VITE_API_URL = "https://eao-uganda.onrender.com"
 
 [context.deploy-preview.environment]
-  VITE_SUPABASE_URL = ""
-  VITE_SUPABASE_ANON_KEY = ""
+  VITE_SUPABASE_URL = "https://db.rogxpucnkqwbeohpkolj.supabase.co"
+  VITE_SUPABASE_ANON_KEY = "sb_publishable_5707Wm_xn45TSDx1haQyqg_hs71FryT"
   VITE_API_URL = "https://eao-uganda.onrender.com"
 
 # Edge functions for better performance
