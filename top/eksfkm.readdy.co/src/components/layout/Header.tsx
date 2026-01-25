@@ -58,11 +58,11 @@ export default function Header() {
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 cursor-pointer group">
-            <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
-              scrolled ? 'bg-teal-600' : 'bg-teal-600/90'
-            }`}>
-              <i className="ri-book-open-line text-2xl text-white"></i>
-            </div>
+            <img 
+              src="/images/logo-1024.png" 
+              alt="Educate an Orphan Uganda Logo" 
+              className="w-24 h-24 transition-all duration-300"
+            />
             <div className="hidden md:block">
               <div className={`text-xl font-bold transition-colors duration-300 ${
                 scrolled ? 'text-gray-900' : 'text-gray-900'
