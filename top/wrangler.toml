@@ -1,0 +1,24 @@
+# Cloudflare Workers/Pages Configuration
+name = "eao-uganda"
+compatibility_date = "2024-01-24"
+compatibility_flags = ["nodejs_compat"]
+
+# Pages configuration
+pages_build_output_dir = "top/eksfkm.readdy.co/dist"
+
+# Environment variables
+[env.production.vars]
+VITE_SUPABASE_URL = "https://db.rogxpucnkqwbeohpkolj.supabase.co"
+VITE_SUPABASE_ANON_KEY = "sb_publishable_5707Wm_xn45TSDx1haQyqg_hs71FryT"
+VITE_API_URL = "https://eao-uganda.onrender.com"
+
+[env.preview.vars]
+VITE_SUPABASE_URL = "https://db.rogxpucnkqwbeohpkolj.supabase.co"
+VITE_SUPABASE_ANON_KEY = "sb_publishable_5707Wm_xn45TSDx1haQyqg_hs71FryT"
+VITE_API_URL = "https://eao-uganda.onrender.com"
+
+# KV namespace for caching (optional)
+[[kv_namespaces]]
+binding = "CACHE"
+id = "your-kv-namespace-id"
+preview_id = "your-preview-kv-namespace-id"
