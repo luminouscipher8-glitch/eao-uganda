@@ -29,3 +29,7 @@ VITE_API_URL = "https://eao-uganda.onrender.com"
 # binding = "CACHE"
 # id = "your-kv-namespace-id"
 # preview_id = "your-preview-kv-namespace-id"
+
+# Build command for Cloudflare Pages
+[build]
+command = "cd top/eksfkm.readdy.co && rm -rf node_modules package-lock.json && npm install && npm run build"

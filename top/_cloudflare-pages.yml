@@ -6,7 +6,7 @@ production_branch: main
 
 # Build configuration
 build:
-  command: "cd top/eksfkm.readdy.co && npm run build"
+  command: "cd top/eksfkm.readdy.co && rm -rf node_modules package-lock.json && npm install && npm run build"
   cwd: "top/eksfkm.readdy.co"
   destination_dir: "dist"
 
