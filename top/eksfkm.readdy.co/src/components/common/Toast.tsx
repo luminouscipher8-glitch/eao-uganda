@@ -4,6 +4,7 @@ import React, {
   useState,
   useCallback,
   ReactNode,
+  useEffect,
 } from 'react';
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info';
@@ -65,6 +66,23 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
   const clearToasts = useCallback(() => {
     setToasts([]);
   }, []);
+
+  // Listen for global toast events
+  useEffect(() => {
+    const handleToastEvent = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      if (customEvent.detail) {
+        addToast(customEvent.detail);
+      }
+    };
+
+    const eventTarget = getToastEventTarget();
+    eventTarget.addEventListener('addToast', handleToastEvent);
+
+    return () => {
+      eventTarget.removeEventListener('addToast', handleToastEvent);
+    };
+  }, [addToast]);
 
   return (
     <ToastContext.Provider
@@ -159,22 +177,40 @@ const ToastItem: React.FC<ToastItemProps> = ({ toast, onRemove }) => {
   );
 };
 
+// Global event system for toast notifications
+let toastEventTarget: EventTarget | null = null;
+
+const getToastEventTarget = () => {
+  if (!toastEventTarget) {
+    toastEventTarget = new EventTarget();
+  }
+  return toastEventTarget;
+};
+
 // Convenience functions for common toast types
 export const toast = {
   success: (title: string, message?: string, duration?: number) => {
-    const { addToast } = useToast();
-    addToast({ type: 'success', title, message, duration });
+    const event = new CustomEvent('addToast', {
+      detail: { type: 'success', title, message, duration }
+    });
+    getToastEventTarget().dispatchEvent(event);
   },
   error: (title: string, message?: string, duration?: number) => {
-    const { addToast } = useToast();
-    addToast({ type: 'error', title, message, duration });
+    const event = new CustomEvent('addToast', {
+      detail: { type: 'error', title, message, duration }
+    });
+    getToastEventTarget().dispatchEvent(event);
   },
   warning: (title: string, message?: string, duration?: number) => {
-    const { addToast } = useToast();
-    addToast({ type: 'warning', title, message, duration });
+    const event = new CustomEvent('addToast', {
+      detail: { type: 'warning', title, message, duration }
+    });
+    getToastEventTarget().dispatchEvent(event);
   },
   info: (title: string, message?: string, duration?: number) => {
-    const { addToast } = useToast();
-    addToast({ type: 'info', title, message, duration });
+    const event = new CustomEvent('addToast', {
+      detail: { type: 'info', title, message, duration }
+    });
+    getToastEventTarget().dispatchEvent(event);
   },
 };
