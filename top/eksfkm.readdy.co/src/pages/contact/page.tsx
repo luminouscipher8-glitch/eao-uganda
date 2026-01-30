@@ -1,4 +1,5 @@
 import { ContactStructuredData } from '../../components/seo/StructuredData';
+import ContactForm from '../../components/forms/ContactForm';
 
 export default function ContactPage() {
   return (
@@ -200,12 +201,7 @@ export default function ContactPage() {
                   respond as soon as possible.
                 </p>
 
-                {/* Contact form will be integrated here */}
-                <div className="bg-gray-100 rounded-xl p-8 text-center">
-                  <p className="text-gray-600">
-                    Contact form integration coming soon...
-                  </p>
-                </div>
+                <ContactForm />
               </div>
 
               {/* Embedded Map */}
