@@ -3,8 +3,6 @@ import ErrorBoundary from './components/common/ErrorBoundary';
 import { LoadingProvider } from './components/providers/LoadingProvider';
 import { ToastProvider } from './components/common/Toast';
 import { AnalyticsProvider } from './components/providers/AnalyticsProvider';
-import { PerformanceProvider } from './hooks/usePerformanceMonitoring';
-import { PerformanceToggle } from './components/performance/PerformanceDashboard';
 import { HomeStructuredData } from './components/seo/StructuredData';
 import SocialMediaMeta from './components/seo/SocialMediaMeta';
 import Header from './components/layout/Header';
@@ -38,31 +36,28 @@ function App() {
       <SocialMediaMeta />
       <ErrorBoundary>
         <AnalyticsProvider>
-          <PerformanceProvider>
-            <ToastProvider>
-              <LoadingProvider>
-                <div className="min-h-screen flex flex-col">
-                  <header role="banner">
-                    <Header />
-                  </header>
-                  <main
-                    id="main-content"
-                    className="flex-1"
-                    role="main"
-                    tabIndex={-1}
-                  >
-                    <AppRoutes />
-                  </main>
-                  <footer role="contentinfo">
-                    <Footer />
-                  </footer>
-                </div>
-              </LoadingProvider>
-            </ToastProvider>
-          </PerformanceProvider>
+          <ToastProvider>
+            <LoadingProvider>
+              <div className="min-h-screen flex flex-col">
+                <header role="banner">
+                  <Header />
+                </header>
+                <main
+                  id="main-content"
+                  className="flex-1"
+                  role="main"
+                  tabIndex={-1}
+                >
+                  <AppRoutes />
+                </main>
+                <footer role="contentinfo">
+                  <Footer />
+                </footer>
+              </div>
+            </LoadingProvider>
+          </ToastProvider>
         </AnalyticsProvider>
       </ErrorBoundary>
-      <PerformanceToggle />
     </Router>
   );
 }
