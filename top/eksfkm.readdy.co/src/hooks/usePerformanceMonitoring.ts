@@ -38,7 +38,7 @@ export const usePerformanceMonitoring = () => {
   const [metrics, setMetrics] = useState<PerformanceMetrics | null>(null);
   const [isMonitoring, setIsMonitoring] = useState(false);
   const vitalsRef = useRef<Partial<CoreWebVitals>>({});
-  const { analytics } = useAnalyticsContext();
+  const { trackEvent } = useAnalyticsContext();
 
   // Get performance rating
   const getPerformanceRating = (
@@ -86,8 +86,8 @@ export const usePerformanceMonitoring = () => {
 
       setMetrics(performanceData);
 
-      if (analytics && !import.meta.env.DEV) {
-        analytics.trackEvent({
+      if (trackEvent && !import.meta.env.DEV) {
+        trackEvent({
           action: 'performance_metrics',
           category: 'performance',
           label: 'core_web_vitals',
@@ -108,7 +108,7 @@ export const usePerformanceMonitoring = () => {
       console.error('Error collecting performance metrics:', error);
       return null;
     }
-  }, [analytics, getPerformanceRating]);
+  }, [trackEvent, getPerformanceRating]);
 
   // Start performance monitoring
   const startMonitoring = useCallback(() => {
