@@ -18,7 +18,6 @@ const FinancialReportsPage = lazy(
   () => import('../pages/financial-reports/page')
 );
 const PartnersPage = lazy(() => import('../pages/partners/page'));
-const LoaderDemoPage = lazy(() => import('../pages/loader-demo/page'));
 const NotFoundPage = lazy(() => import('../pages/NotFound'));
 
 // Route metadata for SEO and analytics
@@ -67,10 +66,6 @@ const routeMeta: Record<string, { title: string; description: string }> = {
     title: 'Partners | Educate an Orphan Uganda',
     description: 'Meet our valued partners and sponsors',
   },
-  '/loader-demo': {
-    title: 'Loader Demo | Educate an Orphan Uganda',
-    description: 'Beautiful loading animations demonstration',
-  },
   '/notfound': {
     title: 'Page Not Found | Educate an Orphan Uganda',
     description: 'Lost? Every journey leads to growth and education.',
@@ -97,7 +92,6 @@ const routes: RouteObject[] = [
   createRoute('/corporate-sponsorship', CorporateSponsorshipPage),
   createRoute('/financial-reports', FinancialReportsPage),
   createRoute('/partners', PartnersPage),
-  createRoute('/loader-demo', LoaderDemoPage),
   createRoute('/notfound', NotFoundPage),
 ];
 
