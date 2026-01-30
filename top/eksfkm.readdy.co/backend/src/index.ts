@@ -92,7 +92,6 @@ app.use('/api/health', healthRoutes);
 // API routes
 app.use('/api/users', userRoutes);
 app.use('/api/contact', contactRoutes);
-app.use('/api/donations', donationRoutes);
 app.use('/api/analytics', analyticsRoutes);
 
 // Root endpoint

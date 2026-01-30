@@ -21,7 +21,7 @@ class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('ErrorBoundary caught an error:', error, errorInfo);
-    
+
     // In production, send to error reporting service
     if (import.meta.env.PROD) {
       // Example: send to Sentry, LogRocket, etc.
@@ -37,9 +37,12 @@ class ErrorBoundary extends Component<Props, State> {
             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <i className="ri-error-warning-line text-2xl text-red-600"></i>
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Something went wrong</h1>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+              Something went wrong
+            </h1>
             <p className="text-gray-600 mb-6">
-              We're sorry, but something unexpected happened. Please try refreshing the page.
+              We're sorry, but something unexpected happened. Please try
+              refreshing the page.
             </p>
             <div className="space-y-3">
               <button
@@ -48,10 +51,7 @@ class ErrorBoundary extends Component<Props, State> {
               >
                 Refresh Page
               </button>
-              <a
-                href="/"
-                className="block w-full btn-secondary text-center"
-              >
+              <a href="/" className="block w-full btn-secondary text-center">
                 Go to Homepage
               </a>
             </div>
