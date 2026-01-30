@@ -39,18 +39,20 @@
 | **Vite** | ✅ Building | Optimized production build |
 
 ### **Environment Variables**
-| Variable | Status | Value |
-|----------|--------|-------|
-| `VITE_SUPABASE_URL` | ✅ Configured | `https://db.rogxpucnkqwbeohpkolj.supabase.co` |
-| `VITE_SUPABASE_ANON_KEY` | ✅ Configured | `sb_publishable_5707Wm_xn45TSDx1haQyqg_hs71FryT` |
-| `VITE_API_URL` | ✅ Configured | `https://eao-uganda.onrender.com` |
+| Variable | Status | Description |
+|----------|--------|---------|
+| `VITE_SUPABASE_URL` | ✅ Configured | Supabase database URL (stored in .env) |
+| `VITE_SUPABASE_ANON_KEY` | ✅ Configured | Supabase anonymous key (stored in .env) |
+| `VITE_API_URL` | ✅ Configured | Backend API endpoint (stored in .env) |
+
+🔒 **Security Note**: All sensitive values are stored in environment variables and never committed to version control. See `.env.example` for required variables.
 
 ---
 
 ## 🌐 **Service Integration Status**
 
 ### **Backend API Integration**
-- **API Endpoint**: https://eao-uganda.onrender.com
+- **API Endpoint**: Configured via VITE_API_URL environment variable
 - **Status**: ✅ **CONNECTED**
 - **Response Time**: ~200-500ms
 - **Authentication**: Supabase Auth
