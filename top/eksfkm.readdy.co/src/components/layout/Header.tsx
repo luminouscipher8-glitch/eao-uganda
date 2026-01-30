@@ -1,7 +1,9 @@
-
 import { Link, useLocation } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
-import { useKeyboardNavigation, useFocusManagement } from '../../hooks/useKeyboardNavigation';
+import {
+  useKeyboardNavigation,
+  useFocusManagement,
+} from '../../hooks/useKeyboardNavigation';
 import AccessibleButton from '../common/AccessibleButton';
 
 export default function Header() {
@@ -34,7 +36,7 @@ export default function Header() {
   // Keyboard navigation for mobile menu
   useKeyboardNavigation(mobileMenuRef, {
     onEscape: () => setIsOpen(false),
-    enabled: isOpen
+    enabled: isOpen,
   });
 
   const navLinks = [
@@ -43,7 +45,7 @@ export default function Header() {
     { path: '/programs', label: 'Programs' },
     { path: '/get-involved', label: 'Get Involved' },
     { path: '/partners', label: 'Partners' },
-    { path: '/contact', label: 'Contact' }
+    { path: '/contact', label: 'Contact' },
   ];
 
   return (
@@ -58,37 +60,51 @@ export default function Header() {
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 cursor-pointer group">
-            <img 
-              src="/images/logo-1024.png" 
-              alt="Educate an Orphan Uganda Logo" 
+            <img
+              src="/images/logo-1024.png"
+              alt="Educate an Orphan Uganda Logo"
               className="w-24 h-24 transition-all duration-300"
             />
             <div className="hidden md:block">
-              <div className={`text-xl font-bold transition-colors duration-300 ${
-                scrolled ? 'text-gray-900' : 'text-gray-900'
-              }`}>
+              <div
+                className={`text-xl font-bold transition-colors duration-300 ${
+                  scrolled ? 'text-gray-900' : 'text-gray-900'
+                }`}
+              >
                 Educate an Orphan
               </div>
-              <div className={`text-xs transition-colors duration-300 ${
-                scrolled ? 'text-gray-600' : 'text-gray-700'
-              }`}>
+              <div
+                className={`text-xs transition-colors duration-300 ${
+                  scrolled ? 'text-gray-600' : 'text-gray-700'
+                }`}
+              >
                 Uganda
               </div>
             </div>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-8" role="navigation" aria-label="Main navigation">
-            {navLinks.map((link) => (
+          <nav
+            className="hidden lg:flex items-center gap-8"
+            role="navigation"
+            aria-label="Main navigation"
+          >
+            {navLinks.map(link => (
               <Link
                 key={link.path}
                 to={link.path}
                 className={`relative text-base font-medium transition-colors duration-300 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 rounded-md px-2 py-1 ${
                   location.pathname === link.path
-                    ? scrolled ? 'text-teal-600' : 'text-teal-700'
-                    : scrolled ? 'text-gray-700 hover:text-teal-600' : 'text-gray-800 hover:text-teal-600'
+                    ? scrolled
+                      ? 'text-teal-600'
+                      : 'text-teal-700'
+                    : scrolled
+                      ? 'text-gray-700 hover:text-teal-600'
+                      : 'text-gray-800 hover:text-teal-600'
                 }`}
-                aria-current={location.pathname === link.path ? 'page' : undefined}
+                aria-current={
+                  location.pathname === link.path ? 'page' : undefined
+                }
               >
                 {link.label}
                 <span
@@ -115,25 +131,30 @@ export default function Header() {
             onClick={() => setIsOpen(!isOpen)}
             variant="ghost"
             className={`lg:hidden w-10 h-10 rounded-lg ${
-              scrolled ? 'text-gray-900 hover:bg-gray-100' : 'text-gray-900 hover:bg-white/50'
+              scrolled
+                ? 'text-gray-900 hover:bg-gray-100'
+                : 'text-gray-900 hover:bg-white/50'
             }`}
             ariaLabel={isOpen ? 'Close mobile menu' : 'Open mobile menu'}
             aria-expanded={isOpen}
           >
-            <i className={`${isOpen ? 'ri-close-line' : 'ri-menu-line'} text-2xl`} aria-hidden="true"></i>
+            <i
+              className={`${isOpen ? 'ri-close-line' : 'ri-menu-line'} text-2xl`}
+              aria-hidden="true"
+            ></i>
           </AccessibleButton>
         </div>
 
         {/* Mobile Menu */}
         {isOpen && (
-          <div 
+          <div
             ref={mobileMenuRef}
             className="lg:hidden py-6 border-t border-gray-200 bg-white/95 backdrop-blur-lg rounded-b-2xl shadow-xl"
             role="navigation"
             aria-label="Mobile navigation"
           >
             <nav className="flex flex-col gap-2">
-              {navLinks.map((link) => (
+              {navLinks.map(link => (
                 <Link
                   key={link.path}
                   to={link.path}
@@ -142,13 +163,15 @@ export default function Header() {
                       ? 'bg-teal-50 text-teal-700 border-l-4 border-teal-600'
                       : 'text-gray-700 hover:bg-gray-50 hover:text-teal-600'
                   }`}
-                  aria-current={location.pathname === link.path ? 'page' : undefined}
+                  aria-current={
+                    location.pathname === link.path ? 'page' : undefined
+                  }
                 >
                   {link.label}
                 </Link>
               ))}
             </nav>
-            
+
             {/* Mobile CTA */}
             <div className="mt-6 px-4">
               <AccessibleButton

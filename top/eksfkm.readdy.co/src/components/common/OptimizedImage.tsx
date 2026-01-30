@@ -1,18 +1,18 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect } from 'react';
 
 interface OptimizedImageProps {
-  src: string
-  alt: string
-  width?: number
-  height?: number
-  className?: string
-  loading?: 'lazy' | 'eager'
-  priority?: boolean
-  sizes?: string
-  placeholder?: 'blur' | 'empty'
-  blurDataURL?: string
-  onLoad?: () => void
-  onError?: () => void
+  src: string;
+  alt: string;
+  width?: number;
+  height?: number;
+  className?: string;
+  loading?: 'lazy' | 'eager';
+  priority?: boolean;
+  sizes?: string;
+  placeholder?: 'blur' | 'empty';
+  blurDataURL?: string;
+  onLoad?: () => void;
+  onError?: () => void;
 }
 
 export default function OptimizedImage({
@@ -29,86 +29,91 @@ export default function OptimizedImage({
   onLoad,
   onError,
 }: OptimizedImageProps) {
-  const [isLoaded, setIsLoaded] = useState(false)
-  const [hasError, setHasError] = useState(false)
-  const [currentSrc, setCurrentSrc] = useState<string>('')
-  const imgRef = useRef<HTMLImageElement>(null)
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [hasError, setHasError] = useState(false);
+  const [currentSrc, setCurrentSrc] = useState<string>('');
+  const imgRef = useRef<HTMLImageElement>(null);
 
   // Generate WebP and fallback sources
   const generateSources = () => {
-    const isExternal = src.startsWith('http')
+    const isExternal = src.startsWith('http');
     if (isExternal) {
       return {
         webp: src,
         fallback: src,
-      }
+      };
     }
 
-    const baseSrc = src.replace(/\.(jpg|jpeg|png)$/i, '')
-    
+    const baseSrc = src.replace(/\.(jpg|jpeg|png)$/i, '');
+
     return {
       webp: `${baseSrc}.webp`,
       fallback: src,
-    }
-  }
+    };
+  };
 
-  const { webp, fallback } = generateSources()
+  const { webp, fallback } = generateSources();
 
   useEffect(() => {
     // Check WebP support
     const checkWebPSupport = () => {
       try {
-        const canvas = document.createElement('canvas')
-        if (!canvas || !canvas.getContext) return false
-        canvas.width = 1
-        canvas.height = 1
-        const ctx = canvas.getContext('2d')
-        if (!ctx) return false
-        return canvas.toDataURL('image/webp').indexOf('data:image/webp') === 0
+        const canvas = document.createElement('canvas');
+        if (!canvas || !canvas.getContext) return false;
+        canvas.width = 1;
+        canvas.height = 1;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return false;
+        return canvas.toDataURL('image/webp').indexOf('data:image/webp') === 0;
       } catch {
-        return false
+        return false;
       }
-    }
+    };
 
-    const supportsWebP = checkWebPSupport()
-    setCurrentSrc(supportsWebP ? webp : fallback)
-  }, [webp, fallback])
+    const supportsWebP = checkWebPSupport();
+    setCurrentSrc(supportsWebP ? webp : fallback);
+  }, [webp, fallback]);
 
   const handleLoad = () => {
-    setIsLoaded(true)
-    setHasError(false)
-    onLoad?.()
-  }
+    setIsLoaded(true);
+    setHasError(false);
+    onLoad?.();
+  };
 
   const handleError = () => {
     if (currentSrc !== fallback) {
       // Fallback to original image if WebP fails
-      setCurrentSrc(fallback)
+      setCurrentSrc(fallback);
     } else {
-      setHasError(true)
-      onError?.()
+      setHasError(true);
+      onError?.();
     }
-  }
+  };
 
-  const placeholderStyle = placeholder === 'blur' && blurDataURL ? {
-    backgroundImage: `url(${blurDataURL})`,
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    filter: 'blur(20px)',
-    transform: 'scale(1.1)',
-  } : {}
+  const placeholderStyle =
+    placeholder === 'blur' && blurDataURL
+      ? {
+          backgroundImage: `url(${blurDataURL})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          filter: 'blur(20px)',
+          transform: 'scale(1.1)',
+        }
+      : {};
 
-  const loadingStyle = !isLoaded ? {
-    opacity: 0,
-    transition: 'opacity 0.3s ease-in-out',
-  } : {
-    opacity: 1,
-    transition: 'opacity 0.3s ease-in-out',
-  }
+  const loadingStyle = !isLoaded
+    ? {
+        opacity: 0,
+        transition: 'opacity 0.3s ease-in-out',
+      }
+    : {
+        opacity: 1,
+        transition: 'opacity 0.3s ease-in-out',
+      };
 
   if (hasError) {
     return (
-      <div 
+      <div
         className={`flex items-center justify-center bg-gray-200 ${className}`}
         style={{ width, height }}
         role="img"
@@ -119,23 +124,21 @@ export default function OptimizedImage({
           <p className="text-sm text-gray-500">Image unavailable</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
-    <div className={`relative overflow-hidden ${className}`} style={{ width, height }}>
+    <div
+      className={`relative overflow-hidden ${className}`}
+      style={{ width, height }}
+    >
       {/* Placeholder */}
       {!isLoaded && placeholder === 'blur' && (
-        <div 
-          className="absolute inset-0 z-10"
-          style={placeholderStyle}
-        />
+        <div className="absolute inset-0 z-10" style={placeholderStyle} />
       )}
-      
+
       {/* Loading skeleton */}
-      {!isLoaded && (
-        <div className="absolute inset-0 z-0 loading-skeleton" />
-      )}
+      {!isLoaded && <div className="absolute inset-0 z-0 loading-skeleton" />}
 
       {/* Main image */}
       <img
@@ -160,5 +163,5 @@ export default function OptimizedImage({
         </div>
       )}
     </div>
-  )
+  );
 }

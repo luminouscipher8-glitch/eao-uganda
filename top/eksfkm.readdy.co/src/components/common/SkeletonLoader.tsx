@@ -1,12 +1,12 @@
-import { cn } from '../../utils/cn'
+import { cn } from '../../utils/cn';
 
 interface SkeletonLoaderProps {
-  className?: string
-  variant?: 'text' | 'circular' | 'rectangular' | 'rounded'
-  width?: string | number
-  height?: string | number
-  lines?: number
-  animation?: 'pulse' | 'wave' | 'none'
+  className?: string;
+  variant?: 'text' | 'circular' | 'rectangular' | 'rounded';
+  width?: string | number;
+  height?: string | number;
+  lines?: number;
+  animation?: 'pulse' | 'wave' | 'none';
 }
 
 export default function SkeletonLoader({
@@ -15,34 +15,35 @@ export default function SkeletonLoader({
   width,
   height,
   lines = 1,
-  animation = 'pulse'
+  animation = 'pulse',
 }: SkeletonLoaderProps) {
-  const baseClasses = 'bg-gray-200 dark:bg-gray-700'
-  
+  const baseClasses = 'bg-gray-200 dark:bg-gray-700';
+
   const variantClasses = {
     text: 'h-4 rounded',
     circular: 'rounded-full',
     rectangular: '',
-    rounded: 'rounded-lg'
-  }
-  
+    rounded: 'rounded-lg',
+  };
+
   const animationClasses = {
     pulse: 'animate-pulse',
     wave: 'animate-shimmer',
-    none: ''
-  }
-  
-  const style: React.CSSProperties = {}
-  if (width) style.width = typeof width === 'number' ? `${width}px` : width
-  if (height) style.height = typeof height === 'number' ? `${height}px` : height
-  
+    none: '',
+  };
+
+  const style: React.CSSProperties = {};
+  if (width) style.width = typeof width === 'number' ? `${width}px` : width;
+  if (height)
+    style.height = typeof height === 'number' ? `${height}px` : height;
+
   const classes = cn(
     baseClasses,
     variantClasses[variant],
     animationClasses[animation],
     className
-  )
-  
+  );
+
   if (variant === 'text' && lines > 1) {
     return (
       <div className={cn('space-y-2', className)}>
@@ -59,27 +60,35 @@ export default function SkeletonLoader({
           />
         ))}
       </div>
-    )
+    );
   }
-  
-  return <div className={classes} style={style} />
+
+  return <div className={classes} style={style} />;
 }
 
 // Card skeleton component
 export function CardSkeleton({ className = '' }: { className?: string }) {
   return (
-    <div className={cn('bg-white rounded-lg shadow-md p-6 space-y-4', className)}>
+    <div
+      className={cn('bg-white rounded-lg shadow-md p-6 space-y-4', className)}
+    >
       <SkeletonLoader variant="circular" width={60} height={60} />
       <div className="space-y-2">
         <SkeletonLoader variant="text" height={20} />
         <SkeletonLoader variant="text" lines={2} />
       </div>
     </div>
-  )
+  );
 }
 
 // List skeleton component
-export function ListSkeleton({ items = 3, className = '' }: { items?: number; className?: string }) {
+export function ListSkeleton({
+  items = 3,
+  className = '',
+}: {
+  items?: number;
+  className?: string;
+}) {
   return (
     <div className={cn('space-y-4', className)}>
       {Array.from({ length: items }).map((_, index) => (
@@ -92,17 +101,26 @@ export function ListSkeleton({ items = 3, className = '' }: { items?: number; cl
         </div>
       ))}
     </div>
-  )
+  );
 }
 
 // Table skeleton component
-export function TableSkeleton({ rows = 5, columns = 4, className = '' }: { 
-  rows?: number; 
-  columns?: number; 
-  className?: string 
+export function TableSkeleton({
+  rows = 5,
+  columns = 4,
+  className = '',
+}: {
+  rows?: number;
+  columns?: number;
+  className?: string;
 }) {
   return (
-    <div className={cn('overflow-hidden rounded-lg border border-gray-200', className)}>
+    <div
+      className={cn(
+        'overflow-hidden rounded-lg border border-gray-200',
+        className
+      )}
+    >
       <div className="bg-gray-50 px-6 py-3">
         <SkeletonLoader variant="text" height={20} />
       </div>
@@ -123,5 +141,5 @@ export function TableSkeleton({ rows = 5, columns = 4, className = '' }: {
         ))}
       </div>
     </div>
-  )
+  );
 }

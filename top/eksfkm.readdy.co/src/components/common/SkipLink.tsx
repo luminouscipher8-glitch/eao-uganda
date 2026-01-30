@@ -1,42 +1,46 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react';
 
 interface SkipLinkProps {
-  href: string
-  children: string
-  className?: string
+  href: string;
+  children: string;
+  className?: string;
 }
 
-export default function SkipLink({ href, children, className = '' }: SkipLinkProps) {
-  const [isVisible, setIsVisible] = useState(false)
+export default function SkipLink({
+  href,
+  children,
+  className = '',
+}: SkipLinkProps) {
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Tab') {
-        setIsVisible(true)
+        setIsVisible(true);
       }
-    }
+    };
 
     const handleMouseDown = () => {
-      setIsVisible(false)
-    }
+      setIsVisible(false);
+    };
 
-    document.addEventListener('keydown', handleKeyDown)
-    document.addEventListener('mousedown', handleMouseDown)
-    
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('mousedown', handleMouseDown);
+
     return () => {
-      document.removeEventListener('keydown', handleKeyDown)
-      document.removeEventListener('mousedown', handleMouseDown)
-    }
-  }, [])
+      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('mousedown', handleMouseDown);
+    };
+  }, []);
 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault()
-    const target = document.querySelector(href) as HTMLElement
+    e.preventDefault();
+    const target = document.querySelector(href) as HTMLElement;
     if (target) {
-      target.focus()
-      target.scrollIntoView({ behavior: 'smooth' })
+      target.focus();
+      target.scrollIntoView({ behavior: 'smooth' });
     }
-  }
+  };
 
   return (
     <a
@@ -54,5 +58,5 @@ export default function SkipLink({ href, children, className = '' }: SkipLinkPro
     >
       {children}
     </a>
-  )
+  );
 }
