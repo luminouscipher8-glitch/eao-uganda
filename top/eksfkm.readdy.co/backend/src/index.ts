@@ -15,6 +15,8 @@ import { contactRoutes } from './routes/contact.js';
 import { donationRoutes } from './routes/donations.js';
 import { analyticsRoutes } from './routes/analytics.js';
 import { healthRoutes } from './routes/health.js';
+import { adminRoutes } from './routes/admin.js';
+import { paymentRoutes } from './routes/payments.js';
 
 dotenv.config();
 
@@ -39,8 +41,16 @@ app.use(compression());
 app.use(morgan('combined'));
 app.use(limiter);
 
-// CORS configuration - locked to Netlify domain
-const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [FRONTEND_URL];
+// CORS configuration - allow localhost for development
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [
+  FRONTEND_URL,
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'http://localhost:3000',
+  'http://127.0.0.1:5173',
+  'http://127.0.0.1:5174',
+  'http://127.0.0.1:3000'
+];
 app.use(cors({
   origin: allowedOrigins,
   credentials: true,
@@ -92,7 +102,10 @@ app.use('/api/health', healthRoutes);
 // API routes
 app.use('/api/users', userRoutes);
 app.use('/api/contact', contactRoutes);
+app.use('/api/donations', donationRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/payments', paymentRoutes);
 
 // Root endpoint
 app.get('/', (req, res) => {
