@@ -1,37 +1,43 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { AuthenticatedRequest, ApiResponse } from '../types/index.js';
+import { createClient } from '@supabase/supabase-js';
 
 // Supabase JWT verification
 export class SupabaseAuth {
   private static readonly SUPABASE_JWT_SECRET = process.env.SUPABASE_JWT_SECRET;
   private static readonly SUPABASE_URL = process.env.SUPABASE_URL;
+  private static readonly SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
 
   /**
    * Verify Supabase JWT token and extract user information
    */
-  static verifySupabaseToken(token: string) {
+  static async verifySupabaseToken(token: string) {
     try {
-      if (!this.SUPABASE_JWT_SECRET) {
-        throw new Error('SUPABASE_JWT_SECRET environment variable is not set');
-      }
-
       // Remove 'Bearer ' prefix if present
       const cleanToken = token.replace('Bearer ', '');
       
-      // Verify JWT token issued by Supabase
-      const decoded = jwt.verify(cleanToken, this.SUPABASE_JWT_SECRET, {
-        algorithms: ['HS256'],
-        issuer: `https://${this.SUPABASE_URL?.replace('https://', '')}/auth/v1`,
-      }) as any;
+      // Create a Supabase client to verify the token
+      const supabase = createClient(
+        this.SUPABASE_URL!,
+        this.SUPABASE_ANON_KEY!
+      );
+
+      // Use Supabase's built-in token verification
+      const { data, error } = await supabase.auth.getUser(cleanToken);
+      const user = data?.user;
+      
+      if (error || !user) {
+        throw new Error('Invalid token');
+      }
 
       return {
-        userId: decoded.sub,
-        email: decoded.email,
-        role: decoded.role || 'authenticated',
-        aud: decoded.aud,
-        exp: decoded.exp,
-        iat: decoded.iat,
+        userId: user.id,
+        email: user.email || '',
+        role: user.user_metadata?.role || 'authenticated',
+        aud: 'authenticated',
+        exp: Math.floor(Date.now() / 1000) + 3600, // Approximate
+        iat: Math.floor(Date.now() / 1000),
       };
     } catch (error) {
       if (error instanceof jwt.JsonWebTokenError) {
@@ -59,7 +65,7 @@ export class SupabaseAuth {
       }
 
       // Verify Supabase JWT
-      const userContext = this.verifySupabaseToken(authHeader);
+      const userContext = await this.verifySupabaseToken(authHeader);
       
       // Attach user info to request
       req.user = userContext;
@@ -81,7 +87,7 @@ export class SupabaseAuth {
       const authHeader = req.headers.authorization;
       
       if (authHeader && authHeader.startsWith('Bearer ')) {
-        const userContext = this.verifySupabaseToken(authHeader);
+        const userContext = await this.verifySupabaseToken(authHeader);
         req.user = userContext;
       }
       
