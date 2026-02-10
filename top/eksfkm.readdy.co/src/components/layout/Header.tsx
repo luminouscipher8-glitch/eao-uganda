@@ -43,6 +43,8 @@ export default function Header() {
     { path: '/', label: 'Home' },
     { path: '/about', label: 'About Us' },
     { path: '/programs', label: 'Programs' },
+    { path: '/blog', label: 'Blog' },
+    { path: '/shop', label: 'Shop' },
     { path: '/get-involved', label: 'Get Involved' },
     { path: '/partners', label: 'Partners' },
     { path: '/contact', label: 'Contact' },
