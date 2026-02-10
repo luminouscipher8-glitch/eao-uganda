@@ -65,13 +65,17 @@ export const ANALYTICS_ACTIONS = {
 // Custom hook for Google Analytics 4
 export const useAnalytics = () => {
   const GA4_MEASUREMENT_ID = import.meta.env.VITE_GA4_MEASUREMENT_ID;
+  const GA4_DEV_MEASUREMENT_ID = import.meta.env.VITE_GA4_DEV_MEASUREMENT_ID;
   const isDevelopment = import.meta.env.DEV;
+
+  // Use development measurement ID if in development mode and available, otherwise use production ID
+  const effectiveMeasurementId = isDevelopment ? (GA4_DEV_MEASUREMENT_ID || 'G-XXXXXXXXXX') : GA4_MEASUREMENT_ID;
 
   // Initialize GA4
   useEffect(() => {
-    if (!GA4_MEASUREMENT_ID || isDevelopment) {
+    if (!effectiveMeasurementId) {
       console.log(
-        '📊 Analytics: GA4 disabled (development mode or no measurement ID)'
+        '📊 Analytics: GA4 disabled (no measurement ID)'
       );
       return;
     }
@@ -79,7 +83,7 @@ export const useAnalytics = () => {
     // Load gtag script
     const script = document.createElement('script');
     script.async = true;
-    script.src = `https://www.googletagmanager.com/gtag/js?id=${GA4_MEASUREMENT_ID}`;
+    script.src = `https://www.googletagmanager.com/gtag/js?id=${effectiveMeasurementId}`;
     document.head.appendChild(script);
 
     // Initialize gtag
@@ -89,7 +93,7 @@ export const useAnalytics = () => {
     };
 
     window.gtag('js', new Date());
-    window.gtag('config', GA4_MEASUREMENT_ID, {
+    window.gtag('config', effectiveMeasurementId, {
       debug_mode: isDevelopment,
       custom_map: {
         custom_parameter_1: 'donation_amount',
@@ -99,13 +103,13 @@ export const useAnalytics = () => {
       },
     });
 
-    console.log('📊 Analytics: GA4 initialized');
-  }, [GA4_MEASUREMENT_ID, isDevelopment]);
+    console.log(`📊 Analytics: GA4 initialized (${isDevelopment ? 'development mode' : 'production mode'})`);
+  }, [effectiveMeasurementId, isDevelopment]);
 
   // Track page views
   const trackPageView = useCallback(
     (path: string, title?: string) => {
-      if (!GA4_MEASUREMENT_ID || isDevelopment) return;
+      if (!effectiveMeasurementId) return;
 
       if (window.gtag) {
         window.gtag('event', 'page_view', {
@@ -114,13 +118,13 @@ export const useAnalytics = () => {
         });
       }
     },
-    [GA4_MEASUREMENT_ID, isDevelopment]
+    [effectiveMeasurementId]
   );
 
   // Track custom events
   const trackEvent = useCallback(
     (event: AnalyticsEvent) => {
-      if (!GA4_MEASUREMENT_ID || isDevelopment) {
+      if (!effectiveMeasurementId) {
         console.log('📊 Analytics Event:', event);
         return;
       }
@@ -134,7 +138,7 @@ export const useAnalytics = () => {
         });
       }
     },
-    [GA4_MEASUREMENT_ID, isDevelopment]
+    [effectiveMeasurementId]
   );
 
   // EAO-specific tracking functions
@@ -319,7 +323,7 @@ export const useAnalytics = () => {
     trackPageView,
     trackEvent,
     analytics,
-    isAnalyticsEnabled: !!GA4_MEASUREMENT_ID && !isDevelopment,
+    isAnalyticsEnabled: !!effectiveMeasurementId,
   };
 };
 

@@ -1,0 +1,331 @@
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useLoading } from '../../components/providers/LoadingProvider';
+import { toast } from '../../components/common/Toast';
+import { useAnalyticsContext } from '../../components/providers/AnalyticsProvider';
+import { pollPaymentStatus, getTrackingIdFromUrl } from '../../services/pesapalApi';
+import { PaymentStatusResponse } from '../../services/pesapalApi';
+
+export default function DonationSuccessPage() {
+  const [paymentStatus, setPaymentStatus] = useState<PaymentStatusResponse | null>(null);
+  const [isPolling, setIsPolling] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  const navigate = useNavigate();
+  const { setLoading, setLoadingMessage } = useLoading();
+  const { analytics } = useAnalyticsContext();
+
+  useEffect(() => {
+    const trackingId = getTrackingIdFromUrl();
+    
+    if (!trackingId) {
+      setError('No payment tracking ID found');
+      setIsPolling(false);
+      return;
+    }
+
+    // Start polling for payment status
+    setLoadingMessage('Confirming your donation...');
+    setLoading(true);
+
+    pollPaymentStatus(
+      trackingId,
+      (status) => {
+        setPaymentStatus(status);
+        // Track payment status changes
+        analytics.trackEvent({
+          action: 'payment_status_update',
+          category: 'payment',
+          label: status.status,
+          customParameters: {
+            tracking_id: trackingId,
+            amount: status.amount.toString(),
+            payment_type: status.type,
+          },
+        });
+      },
+      30, // max attempts (1 minute)
+      2000 // interval (2 seconds)
+    )
+      .then((finalStatus) => {
+        setPaymentStatus(finalStatus);
+        setIsPolling(false);
+        setLoading(false);
+        
+        if (finalStatus.status === 'COMPLETED') {
+          // Track successful donation
+          analytics.trackDonationCompleted(
+            finalStatus.amount.toString(),
+            'pesapal'
+          );
+          
+          toast.success(
+            'Thank You for Your Donation!',
+            'Your generous donation has been successfully processed. You will receive a receipt via email.',
+            8000
+          );
+        } else if (finalStatus.status === 'FAILED') {
+          analytics.trackDonationFailed(
+            'Payment failed after processing',
+            finalStatus.amount.toString()
+          );
+          
+          toast.error(
+            'Payment Failed',
+            'Unfortunately, your donation could not be processed. Please try again or contact support.',
+            8000
+          );
+        }
+      })
+      .catch((err) => {
+        console.error('Payment status polling error:', err);
+        setError('Failed to confirm payment status');
+        setIsPolling(false);
+        setLoading(false);
+        
+        toast.error(
+          'Payment Status Error',
+          'Unable to confirm your payment status. Please contact support if you believe this is an error.',
+          8000
+        );
+      });
+  }, [navigate, setLoading, analytics]);
+
+  const handleDonateAgain = () => {
+    navigate('/donate');
+  };
+
+  const handleContactSupport = () => {
+    navigate('/contact');
+  };
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+        <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Payment Error</h1>
+          <p className="text-gray-600 mb-6">{error}</p>
+          <div className="space-y-3">
+            <button
+              onClick={handleDonateAgain}
+              className="w-full bg-amber-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-amber-700 transition-colors"
+            >
+              Try Again
+            </button>
+            <button
+              onClick={handleContactSupport}
+              className="w-full bg-gray-100 text-gray-700 py-3 px-4 rounded-lg font-medium hover:bg-gray-200 transition-colors"
+            >
+              Contact Support
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (isPolling || !paymentStatus) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+        <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
+          <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-8 h-8 border-2 border-amber-600 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Confirming Your Donation</h1>
+          <p className="text-gray-600 mb-4">
+            Please wait while we confirm your payment status...
+          </p>
+          <div className="space-y-2 text-sm text-gray-500">
+            <p>• Verifying payment with Pesapal</p>
+            <p>• Updating your donation record</p>
+            <p>• Preparing your receipt</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Success Header */}
+      <div className={`${
+        paymentStatus.status === 'COMPLETED' 
+          ? 'bg-gradient-to-r from-green-600 to-emerald-600' 
+          : 'bg-gradient-to-r from-red-600 to-pink-600'
+      } text-white py-12`}>
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 ${
+            paymentStatus.status === 'COMPLETED' ? 'bg-white/20' : 'bg-white/20'
+          }`}>
+            {paymentStatus.status === 'COMPLETED' ? (
+              <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            ) : (
+              <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            )}
+          </div>
+          <h1 className="text-3xl md:text-4xl font-bold mb-2">
+            {paymentStatus.status === 'COMPLETED' 
+              ? 'Thank You for Your Donation!' 
+              : 'Payment Failed'
+            }
+          </h1>
+          <p className="text-xl opacity-95">
+            {paymentStatus.status === 'COMPLETED' 
+              ? 'Your generous donation has been successfully processed.'
+              : 'Unfortunately, your donation could not be processed.'
+            }
+          </p>
+        </div>
+      </div>
+
+      {/* Payment Details */}
+      <div className="max-w-4xl mx-auto px-4 py-12">
+        <div className="grid md:grid-cols-2 gap-8">
+          {/* Receipt */}
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Donation Receipt</h2>
+            
+            <div className="space-y-4">
+              <div className="flex justify-between py-2 border-b border-gray-200">
+                <span className="text-gray-600">Transaction ID</span>
+                <span className="font-mono text-sm">{paymentStatus.merchant_reference}</span>
+              </div>
+              
+              <div className="flex justify-between py-2 border-b border-gray-200">
+                <span className="text-gray-600">Tracking ID</span>
+                <span className="font-mono text-sm">{paymentStatus.tracking_id}</span>
+              </div>
+              
+              <div className="flex justify-between py-2 border-b border-gray-200">
+                <span className="text-gray-600">Amount</span>
+                <span className="font-bold text-lg">
+                  UGX {paymentStatus.amount.toLocaleString()}
+                </span>
+              </div>
+              
+              <div className="flex justify-between py-2 border-b border-gray-200">
+                <span className="text-gray-600">Status</span>
+                <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                  paymentStatus.status === 'COMPLETED'
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-red-100 text-red-800'
+                }`}>
+                  {paymentStatus.status}
+                </span>
+              </div>
+              
+              <div className="flex justify-between py-2 border-b border-gray-200">
+                <span className="text-gray-600">Payment Method</span>
+                <span>{paymentStatus.payment_method || 'Processing...'}</span>
+              </div>
+              
+              <div className="flex justify-between py-2">
+                <span className="text-gray-600">Date</span>
+                <span>{new Date(paymentStatus.created_at).toLocaleDateString()}</span>
+              </div>
+            </div>
+
+            {paymentStatus.status === 'COMPLETED' && (
+              <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                <p className="text-sm text-green-800">
+                  <strong>Receipt Sent:</strong> A detailed receipt has been sent to your email address. 
+                  Please keep it for your records.
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Next Steps */}
+          <div className="space-y-6">
+            {paymentStatus.status === 'COMPLETED' ? (
+              <>
+                <div className="bg-white rounded-lg shadow-lg p-6">
+                  <h3 className="text-lg font-bold text-gray-900 mb-4">What's Next?</h3>
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <svg className="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <p className="text-sm text-gray-600">
+                        You'll receive a confirmation email with your donation details within 24 hours.
+                      </p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <svg className="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <p className="text-sm text-gray-600">
+                        Your donation will immediately support our education programs in Uganda.
+                      </p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <svg className="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <p className="text-sm text-gray-600">
+                        We'll send you updates on how your donation is making an impact.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-lg p-6 border border-amber-200">
+                  <h4 className="font-semibold text-gray-900 mb-2">Share Your Impact</h4>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Inspire others by sharing your donation on social media.
+                  </p>
+                  <div className="flex gap-3">
+                    <button className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+                      Share on Facebook
+                    </button>
+                    <button className="flex-1 bg-sky-500 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-sky-600 transition-colors">
+                      Share on Twitter
+                    </button>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="bg-white rounded-lg shadow-lg p-6">
+                <h3 className="text-lg font-bold text-gray-900 mb-4">What Can You Do?</h3>
+                <div className="space-y-4">
+                  <p className="text-sm text-gray-600">
+                    Sometimes payments fail due to network issues or insufficient funds. Here are your options:
+                  </p>
+                  <div className="space-y-3">
+                    <button
+                      onClick={handleDonateAgain}
+                      className="w-full bg-amber-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-amber-700 transition-colors"
+                    >
+                      Try Donation Again
+                    </button>
+                    <button
+                      onClick={handleContactSupport}
+                      className="w-full bg-gray-100 text-gray-700 py-3 px-4 rounded-lg font-medium hover:bg-gray-200 transition-colors"
+                    >
+                      Contact Support
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
