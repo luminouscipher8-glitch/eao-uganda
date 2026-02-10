@@ -88,7 +88,7 @@ export default function DonatePage() {
       }
     } catch (error) {
       console.error('Donation error:', error);
-      logApiError(error as Error, 'donation_submission');
+      logApiError(error as Error, 'donation_submission', 'POST');
       
       analytics.trackDonationFailed('Payment processing failed', selectedAmount, 'pesapal', undefined as any);
       
