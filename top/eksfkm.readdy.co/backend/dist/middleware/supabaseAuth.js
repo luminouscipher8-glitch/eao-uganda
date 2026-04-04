@@ -1,45 +1,30 @@
-import jwt from 'jsonwebtoken';
-// Supabase JWT verification
+import { createClient } from '@supabase/supabase-js';
 export class SupabaseAuth {
-    static SUPABASE_JWT_SECRET = process.env.SUPABASE_JWT_SECRET;
     static SUPABASE_URL = process.env.SUPABASE_URL;
-    /**
-     * Verify Supabase JWT token and extract user information
-     */
-    static verifySupabaseToken(token) {
-        try {
-            if (!this.SUPABASE_JWT_SECRET) {
-                throw new Error('SUPABASE_JWT_SECRET environment variable is not set');
-            }
-            // Remove 'Bearer ' prefix if present
-            const cleanToken = token.replace('Bearer ', '');
-            // Verify JWT token issued by Supabase
-            const decoded = jwt.verify(cleanToken, this.SUPABASE_JWT_SECRET, {
-                algorithms: ['HS256'],
-                issuer: `https://${this.SUPABASE_URL?.replace('https://', '')}/auth/v1`,
-            });
-            return {
-                userId: decoded.sub,
-                email: decoded.email,
-                role: decoded.role || 'authenticated',
-                aud: decoded.aud,
-                exp: decoded.exp,
-                iat: decoded.iat,
-            };
+    static SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
+    // ✅ Reuse single client instance (performance improvement)
+    static supabase = createClient(SupabaseAuth.SUPABASE_URL, SupabaseAuth.SUPABASE_ANON_KEY);
+    static async verifySupabaseToken(token) {
+        const cleanToken = token.replace(/^Bearer\s+/i, '');
+        // ✅ Fix TS error safely
+        const { data, error } = await this.supabase.auth.getUser(cleanToken);
+        const user = data?.user;
+        if (error || !user) {
+            throw new Error('Invalid token');
         }
-        catch (error) {
-            if (error instanceof jwt.JsonWebTokenError) {
-                throw new Error('Invalid token');
-            }
-            else if (error instanceof jwt.TokenExpiredError) {
-                throw new Error('Token expired');
-            }
-            throw error;
-        }
+        const rawRole = user.user_metadata?.role ||
+            user.app_metadata?.role ||
+            'authenticated';
+        const role = String(rawRole).toLowerCase() === 'admin' ? 'admin' : 'authenticated';
+        return {
+            userId: user.id,
+            email: user.email || '',
+            role,
+            aud: user.aud || 'authenticated',
+            exp: 0,
+            iat: 0,
+        };
     }
-    /**
-     * Middleware to authenticate Supabase JWT
-     */
     static authenticate = async (req, res, next) => {
         try {
             const authHeader = req.headers.authorization;
@@ -50,10 +35,7 @@ export class SupabaseAuth {
                 });
                 return;
             }
-            // Verify Supabase JWT
-            const userContext = this.verifySupabaseToken(authHeader);
-            // Attach user info to request
-            req.user = userContext;
+            req.user = await this.verifySupabaseToken(authHeader);
             next();
         }
         catch (error) {
@@ -63,26 +45,18 @@ export class SupabaseAuth {
             });
         }
     };
-    /**
-     * Middleware for optional authentication (doesn't fail if no token)
-     */
-    static optionalAuth = async (req, res, next) => {
+    static optionalAuth = async (req, _res, next) => {
         try {
             const authHeader = req.headers.authorization;
-            if (authHeader && authHeader.startsWith('Bearer ')) {
-                const userContext = this.verifySupabaseToken(authHeader);
-                req.user = userContext;
+            if (authHeader?.startsWith('Bearer ')) {
+                req.user = await this.verifySupabaseToken(authHeader);
             }
             next();
         }
-        catch (error) {
-            // Continue without authentication for optional auth
+        catch {
             next();
         }
     };
-    /**
-     * Middleware to authorize based on user role
-     */
     static authorize = (allowedRoles) => {
         return (req, res, next) => {
             if (!req.user) {
@@ -92,8 +66,7 @@ export class SupabaseAuth {
                 });
                 return;
             }
-            // Check if user has required role
-            const userRole = req.user.aud === 'authenticated' ? 'authenticated' : (req.user.role || 'authenticated');
+            const userRole = (req.user.role || 'authenticated');
             if (!allowedRoles.includes(userRole)) {
                 res.status(403).json({
                     success: false,
@@ -104,21 +77,38 @@ export class SupabaseAuth {
             next();
         };
     };
-    /**
-     * Middleware to check if user is admin
-     */
-    static requireAdmin = this.authorize(['authenticated', 'admin']);
-    /**
-     * Extract user ID from Supabase JWT
-     */
+    static requireAdmin = SupabaseAuth.authorize(['admin']);
     static extractUserId(req) {
         return req.user?.userId || null;
     }
-    /**
-     * Check if user is authenticated
-     */
     static isAuthenticated(req) {
         return !!req.user;
     }
+    static requireAdminVerification = (req, res, next) => {
+        try {
+            if (!req.user) {
+                res.status(401).json({
+                    success: false,
+                    error: 'Unauthorized',
+                });
+                return;
+            }
+            const role = req.user.role;
+            if (role !== 'admin') {
+                res.status(403).json({
+                    success: false,
+                    error: 'Admin privileges required',
+                });
+                return;
+            }
+            next();
+        }
+        catch {
+            res.status(500).json({
+                success: false,
+                error: 'Admin verification failed',
+            });
+        }
+    };
 }
 //# sourceMappingURL=supabaseAuth.js.map

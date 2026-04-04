@@ -86,7 +86,7 @@ router.put('/profile', SupabaseAuth.authenticate, updateProfileValidation, async
  *       403:
  *         description: Insufficient permissions
  */
-router.get('/', SupabaseAuth.authenticate, SupabaseAuth.requireAdmin, asyncHandler(userController.getAllUsers));
+router.get('/', SupabaseAuth.authenticate, SupabaseAuth.requireAdminVerification, asyncHandler(userController.getAllUsers));
 /**
  * @swagger
  * /api/users/{id}:

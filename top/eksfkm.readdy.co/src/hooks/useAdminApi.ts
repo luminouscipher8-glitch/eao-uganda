@@ -15,7 +15,7 @@ export function useApi<T>(
       setLoading(true);
       setError(null);
       const result = await apiCall();
-      
+
       if (result.success && result.data) {
         setData(result.data);
       } else {
@@ -39,29 +39,13 @@ export function useApi<T>(
   return { data, loading, error, refetch };
 }
 
-// Specific hooks for different data types
+// Specific hooks for supported data types
 export function useDashboardStats() {
   return useApi(() => adminApi.getDashboardStats());
 }
 
 export function usePrograms() {
   return useApi(() => adminApi.getPrograms());
-}
-
-export function useNews() {
-  return useApi(() => adminApi.getNews());
-}
-
-export function useContacts() {
-  return useApi(() => adminApi.getContacts());
-}
-
-export function useDonations() {
-  return useApi(() => adminApi.getDonations());
-}
-
-export function useVolunteers() {
-  return useApi(() => adminApi.getVolunteers());
 }
 
 export function useEvents() {
@@ -88,7 +72,7 @@ export function useMutation<T, P = any>(
       setLoading(true);
       setError(null);
       const result = await mutationCall(params);
-      
+
       if (result.success && result.data) {
         return result.data;
       } else {
@@ -111,7 +95,7 @@ export function useMutation<T, P = any>(
   return { mutate, loading, error, reset };
 }
 
-// Specific mutation hooks
+// Program mutations
 export function useCreateProgram() {
   return useMutation((program: Parameters<typeof adminApi.createProgram>[0]) =>
     adminApi.createProgram(program)
@@ -119,8 +103,9 @@ export function useCreateProgram() {
 }
 
 export function useUpdateProgram() {
-  return useMutation(({ id, program }: { id: string; program: Parameters<typeof adminApi.updateProgram>[1] }) =>
-    adminApi.updateProgram(id, program)
+  return useMutation(
+    ({ id, program }: { id: string; program: Parameters<typeof adminApi.updateProgram>[1] }) =>
+      adminApi.updateProgram(id, program)
   );
 }
 
@@ -128,35 +113,7 @@ export function useDeleteProgram() {
   return useMutation((id: string) => adminApi.deleteProgram(id));
 }
 
-export function useCreateNews() {
-  return useMutation((news: Parameters<typeof adminApi.createNews>[0]) =>
-    adminApi.createNews(news)
-  );
-}
-
-export function useUpdateNews() {
-  return useMutation(({ id, news }: { id: string; news: Parameters<typeof adminApi.updateNews>[1] }) =>
-    adminApi.updateNews(id, news)
-  );
-}
-
-export function useDeleteNews() {
-  return useMutation((id: string) => adminApi.deleteNews(id));
-}
-
-export function useUpdateContactStatus() {
-  return useMutation(({ id, status }: { id: string; status: 'new' | 'in_progress' | 'resolved' }) =>
-    adminApi.updateContactStatus(id, status)
-  );
-}
-
-export function useUpdateVolunteerStatus() {
-  return useMutation(({ id, status }: { id: string; status: 'pending' | 'approved' | 'rejected' }) =>
-    adminApi.updateVolunteerStatus(id, status)
-  );
-}
-
-// Events mutations
+// Event mutations
 export function useCreateEvent() {
   return useMutation((event: Parameters<typeof adminApi.createEvent>[0]) =>
     adminApi.createEvent(event)
@@ -164,8 +121,9 @@ export function useCreateEvent() {
 }
 
 export function useUpdateEvent() {
-  return useMutation(({ id, event }: { id: string; event: Parameters<typeof adminApi.updateEvent>[1] }) =>
-    adminApi.updateEvent(id, event)
+  return useMutation(
+    ({ id, event }: { id: string; event: Parameters<typeof adminApi.updateEvent>[1] }) =>
+      adminApi.updateEvent(id, event)
   );
 }
 
@@ -174,8 +132,9 @@ export function useDeleteEvent() {
 }
 
 export function useUpdateEventStatus() {
-  return useMutation(({ id, status }: { id: string; status: 'upcoming' | 'ongoing' | 'completed' | 'cancelled' }) =>
-    adminApi.updateEventStatus(id, status)
+  return useMutation(
+    ({ id, status }: { id: string; status: 'upcoming' | 'ongoing' | 'completed' | 'cancelled' }) =>
+      adminApi.updateEventStatus(id, status)
   );
 }
 
@@ -187,8 +146,9 @@ export function useCreateSchoolBuildingPhase() {
 }
 
 export function useUpdateSchoolBuildingPhase() {
-  return useMutation(({ id, phase }: { id: string; phase: Parameters<typeof adminApi.updateSchoolBuildingPhase>[1] }) =>
-    adminApi.updateSchoolBuildingPhase(id, phase)
+  return useMutation(
+    ({ id, phase }: { id: string; phase: Parameters<typeof adminApi.updateSchoolBuildingPhase>[1] }) =>
+      adminApi.updateSchoolBuildingPhase(id, phase)
   );
 }
 
@@ -197,8 +157,9 @@ export function useDeleteSchoolBuildingPhase() {
 }
 
 export function useUpdateSchoolBuildingProgress() {
-  return useMutation(({ id, progress_percentage }: { id: string; progress_percentage: number }) =>
-    adminApi.updateSchoolBuildingProgress(id, progress_percentage)
+  return useMutation(
+    ({ id, progress }: { id: string; progress: number }) =>
+      adminApi.updateSchoolBuildingProgress(id, progress)
   );
 }
 
@@ -210,8 +171,9 @@ export function useCreateSuccessStory() {
 }
 
 export function useUpdateSuccessStory() {
-  return useMutation(({ id, story }: { id: string; story: Parameters<typeof adminApi.updateSuccessStory>[1] }) =>
-    adminApi.updateSuccessStory(id, story)
+  return useMutation(
+    ({ id, story }: { id: string; story: Parameters<typeof adminApi.updateSuccessStory>[1] }) =>
+      adminApi.updateSuccessStory(id, story)
   );
 }
 
@@ -220,8 +182,9 @@ export function useDeleteSuccessStory() {
 }
 
 export function useUpdateSuccessStoryStatus() {
-  return useMutation(({ id, status }: { id: string; status: 'draft' | 'published' | 'archived' }) =>
-    adminApi.updateSuccessStoryStatus(id, status)
+  return useMutation(
+    ({ id, status }: { id: string; status: 'draft' | 'published' | 'archived' }) =>
+      adminApi.updateSuccessStoryStatus(id, status)
   );
 }
 
@@ -230,22 +193,21 @@ export function useToggleSuccessStoryFeatured() {
 }
 
 export function useFileUpload() {
-  return useMutation(({ file, folder }: { file: File; folder?: string }) =>
-    adminApi.uploadFile(file, folder)
+  return useMutation(
+    ({ file, folder }: { file: File; folder?: string }) =>
+      adminApi.uploadFile(file, folder)
   );
 }
 
-// Combined hook for all admin API operations
+// Combined hook for supported admin API operations
 export function useAdminApi() {
   return {
-    // Programs
     programs: {
       getPrograms: () => adminApi.getPrograms(),
       createProgram: (data: any) => adminApi.createProgram(data),
       updateProgram: (id: string, data: any) => adminApi.updateProgram(id, data),
       deleteProgram: (id: string) => adminApi.deleteProgram(id),
     },
-    // Events
     events: {
       getEvents: () => adminApi.getEvents(),
       createEvent: (data: any) => adminApi.createEvent(data),
@@ -253,47 +215,26 @@ export function useAdminApi() {
       deleteEvent: (id: string) => adminApi.deleteEvent(id),
       updateEventStatus: (id: string, status: any) => adminApi.updateEventStatus(id, status),
     },
-    // School Building
     schoolBuilding: {
       getSchoolBuilding: () => adminApi.getSchoolBuilding(),
       createSchoolBuildingPhase: (data: any) => adminApi.createSchoolBuildingPhase(data),
       updateSchoolBuildingPhase: (id: string, data: any) => adminApi.updateSchoolBuildingPhase(id, data),
       deleteSchoolBuildingPhase: (id: string) => adminApi.deleteSchoolBuildingPhase(id),
-      updateSchoolBuildingProgress: (id: string, progress_percentage: number) => adminApi.updateSchoolBuildingProgress(id, progress_percentage),
+      updateSchoolBuildingProgress: (id: string, progress: number) =>
+        adminApi.updateSchoolBuildingProgress(id, progress),
     },
-    // Success Stories
     successStories: {
       getSuccessStories: () => adminApi.getSuccessStories(),
       createSuccessStory: (data: any) => adminApi.createSuccessStory(data),
       updateSuccessStory: (id: string, data: any) => adminApi.updateSuccessStory(id, data),
       deleteSuccessStory: (id: string) => adminApi.deleteSuccessStory(id),
-      updateSuccessStoryStatus: (id: string, status: any) => adminApi.updateSuccessStoryStatus(id, status),
-      toggleSuccessStoryFeatured: (id: string) => adminApi.toggleSuccessStoryFeatured(id),
+      updateSuccessStoryStatus: (id: string, status: any) =>
+        adminApi.updateSuccessStoryStatus(id, status),
+      toggleSuccessStoryFeatured: (id: string) =>
+        adminApi.toggleSuccessStoryFeatured(id),
     },
-    // News
-    news: {
-      getNews: () => adminApi.getNews(),
-      createNews: (data: any) => adminApi.createNews(data),
-      updateNews: (id: string, data: any) => adminApi.updateNews(id, data),
-      deleteNews: (id: string) => adminApi.deleteNews(id),
-    },
-    // Contacts
-    contacts: {
-      getContacts: () => adminApi.getContacts(),
-      updateContactStatus: (id: string, status: any) => adminApi.updateContactStatus(id, status),
-    },
-    // Donations
-    donations: {
-      getDonations: () => adminApi.getDonations(),
-    },
-    // Volunteers
-    volunteers: {
-      getVolunteers: () => adminApi.getVolunteers(),
-      updateVolunteerStatus: (id: string, status: any) => adminApi.updateVolunteerStatus(id, status),
-    },
-    // Dashboard
     dashboard: {
       getStats: () => adminApi.getDashboardStats(),
-    }
+    },
   };
 }

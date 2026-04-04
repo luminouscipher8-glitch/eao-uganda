@@ -63,17 +63,17 @@ export default function DonatePage() {
     setLoadingMessage('Connecting to Pesapal payment gateway...');
     setLoading(true);
 
-    try {
-      // Prepare donation data for Pesapal API
-      const paymentData: PesapalPaymentRequest = {
-        amount: parseFloat(selectedAmount),
-        currency: 'UGX',
-        donorName: formData.name,
-        donorEmail: formData.email,
-        donorPhone: formData.phone,
-        message: formData.message,
-      };
+    // Prepare donation data for Pesapal API
+    const paymentData: PesapalPaymentRequest = {
+      amount: parseFloat(selectedAmount),
+      currency: 'UGX',
+      donorName: formData.name,
+      donorEmail: formData.email,
+      donorPhone: formData.phone,
+      message: formData.message,
+    };
 
+    try {
       // Create payment with Pesapal
       const response = await createDonationPayment(paymentData);
 
@@ -88,7 +88,15 @@ export default function DonatePage() {
       }
     } catch (error) {
       console.error('Donation error:', error);
-      logApiError(error as Error, 'donation_submission', 'POST');
+      
+      const errAny = error as any;
+      logApiError(
+        errAny,
+        "/api/payments/donations/create",
+        "POST",
+        errAny.status,
+        paymentData
+      );
       
       analytics.trackDonationFailed('Payment processing failed', selectedAmount, 'pesapal', undefined as any);
       
@@ -139,7 +147,7 @@ export default function DonatePage() {
           <div className="absolute inset-0 bg-black opacity-10"></div>
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
             <div className="text-center">
-              <h1 className="text-4xl md:text-6xl font-bold mb-6">
+              <h1 className="text-4xl md:text-6xl font-bold mb-6 pt-20">
                 Transform Lives Through Education
               </h1>
               <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto opacity-95">
@@ -246,7 +254,7 @@ export default function DonatePage() {
 
                     {/* Impact Message */}
                     {(customAmount || amount) && (
-                      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4" style={{ marginTop: 20 }}>
                         <p className="text-sm text-amber-800">
                           <strong>Your Impact:</strong> {getImpactText(customAmount || amount)}
                         </p>
@@ -363,13 +371,14 @@ export default function DonatePage() {
                 </h3>
                 <div className="aspect-w-5 aspect-h-1">
                   <iframe
-                    width="200"
-                    height="40"
-                    src="https://store.pesapal.com/embed-code?pageUrl=https://store.pesapal.com/welcometodonationssection"
-                    frameBorder="0"
-                    allowFullScreen
-                    className="w-full rounded-lg"
-                  />
+  title="Pesapal secure donation widget"
+  loading="lazy"
+  width="200"
+  height="40"
+  src="https://store.pesapal.com/embed-code?pageUrl=https://store.pesapal.com/welcometodonationssection"
+  allowFullScreen
+  className="w-full rounded-lg"
+/>
                 </div>
               </div>
 

@@ -20,6 +20,7 @@ const FinancialReportsPage = lazy(
 );
 const PartnersPage = lazy(() => import('../pages/partners/page'));
 const ShopPage = lazy(() => import('../pages/shop/page'));
+const ShopSuccessPage = lazy(() => import('../pages/shop/success'));
 const BlogPage = lazy(() => import('../pages/blog/page'));
 const BlogPostPage = lazy(() => import('../pages/blog/[id]/page'));
 const NotFoundPage = lazy(() => import('../pages/NotFound'));
@@ -28,11 +29,6 @@ const NotFoundPage = lazy(() => import('../pages/NotFound'));
 const AdminLogin = lazy(() => import('../pages/admin/login/page'));
 const AdminDashboard = lazy(() => import('../pages/admin/dashboard/page'));
 const AdminPrograms = lazy(() => import('../pages/admin/programs/page'));
-const AdminNews = lazy(() => import('../pages/admin/news/page'));
-const AdminContacts = lazy(() => import('../pages/admin/contacts/page'));
-const AdminDonations = lazy(() => import('../pages/admin/donations/page'));
-const AdminVolunteers = lazy(() => import('../pages/admin/volunteers/page'));
-
 // Route metadata for SEO and analytics
 const routeMeta: Record<string, { title: string; description: string }> = {
   '/': {
@@ -86,6 +82,10 @@ const routeMeta: Record<string, { title: string; description: string }> = {
   '/shop': {
     title: 'Shop | Educate an Orphan Uganda',
     description: 'Support our mission through meaningful merchandise',
+  },
+  '/shop/success': {
+    title: 'Order Success | Educate an Orphan Uganda',
+    description: 'Thank you for your purchase',
   },
   '/blog': {
     title: 'Blog | Educate an Orphan Uganda',
@@ -149,17 +149,14 @@ const routes: RouteObject[] = [
   createRoute('/financial-reports', FinancialReportsPage),
   createRoute('/partners', PartnersPage),
   createRoute('/shop', ShopPage),
+  createRoute('/shop/success', ShopSuccessPage),
   createRoute('/blog', BlogPage),
   createRoute('/blog/:id', BlogPostPage),
   createRoute('/notfound', NotFoundPage),
   // Admin routes
   createRoute('/admin/login', AdminLogin),
   createRoute('/admin', AdminDashboard),
-  createRoute('/admin/programs', AdminPrograms),
-  createRoute('/admin/news', AdminNews),
-  createRoute('/admin/contacts', AdminContacts),
-  createRoute('/admin/donations', AdminDonations),
-  createRoute('/admin/volunteers', AdminVolunteers),
+  createRoute('/admin/programs', AdminPrograms)
 ];
 
 export { routeMeta };

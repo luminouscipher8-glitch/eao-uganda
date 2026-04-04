@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
-import { 
-  Save, 
-  Upload, 
-  X, 
+import {
+  Save,
   AlertCircle,
   Calendar,
   MapPin,
@@ -20,6 +18,21 @@ const statusColors = {
   ongoing: 'blue',
   completed: 'green',
   cancelled: 'red',
+};
+
+const getStatusBadgeClasses = (status: keyof typeof statusColors) => {
+  switch (status) {
+    case 'upcoming':
+      return 'bg-yellow-100 text-yellow-800';
+    case 'ongoing':
+      return 'bg-blue-100 text-blue-800';
+    case 'completed':
+      return 'bg-green-100 text-green-800';
+    case 'cancelled':
+      return 'bg-red-100 text-red-800';
+    default:
+      return 'bg-gray-100 text-gray-800';
+  }
 };
 
 const eventTypeIcons = {
@@ -113,11 +126,11 @@ export default function EventModal({ isOpen, onClose, eventId, onSuccess }: Even
           location: event.location || '',
           participants: event.participants,
           funds_raised: event.funds_raised,
-          image: event.image,
+          image: event.image || '',
           is_featured: event.is_featured,
           status: event.status,
         });
-        setImagePreview(event.image);
+        setImagePreview(event.image || '');
       }
     } catch (error) {
       console.error('Failed to fetch event:', error);
@@ -141,7 +154,7 @@ export default function EventModal({ isOpen, onClose, eventId, onSuccess }: Even
       newErrors.event_date = 'Event date is required';
     }
     
-    if (!formData.image.trim()) {
+    if (!(formData.image || '').trim()) {
       newErrors.image = 'Event image is required';
     }
     
@@ -186,23 +199,10 @@ export default function EventModal({ isOpen, onClose, eventId, onSuccess }: Even
     }
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        setErrors({ image: 'Image size must be less than 5MB' });
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const result = reader.result as string;
-        setImagePreview(result);
-        setFormData((prev: EventFormData) => ({ ...prev, image: result }));
-        setErrors((prev: Record<string, string>) => ({ ...prev, image: '' }));
-      };
-      reader.readAsDataURL(file);
-    }
+    const handleImageChange = (url: string) => {
+    setImagePreview(url);
+    setFormData((prev: EventFormData) => ({ ...prev, image: url }));
+    setErrors((prev: Record<string, string>) => ({ ...prev, image: '' }));
   };
 
   const removeImage = () => {
@@ -272,7 +272,11 @@ export default function EventModal({ isOpen, onClose, eventId, onSuccess }: Even
               
               {/* Status Badge */}
               <div className="absolute top-2 right-2">
-                <span className={`px-2 py-1 text-xs font-medium rounded-full bg-${statusColors[formData.status as keyof typeof statusColors]}-100 text-${statusColors[formData.status as keyof typeof statusColors]}-800`}>
+                <span
+                  className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusBadgeClasses(
+                    formData.status as keyof typeof statusColors
+                  )}`}
+                >
                   {formData.status}
                 </span>
               </div>
@@ -507,48 +511,46 @@ export default function EventModal({ isOpen, onClose, eventId, onSuccess }: Even
                   </select>
                 </div>
 
-                {/* Image Upload */}
+                {/* Image URL */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Event Image <span className="text-red-500">*</span>
+                  <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-2">
+                    Event Image URL <span className="text-red-500">*</span>
                   </label>
-                  <div className="space-y-3">
-                    {imagePreview ? (
-                      <div className="relative">
+                  <input
+                    type="text"
+                    id="image"
+                    value={formData.image || ''}
+                    onChange={(e) => handleImageChange(e.target.value)}
+                    className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
+                      errors.image ? 'border-red-300' : 'border-gray-300'
+                    }`}
+                    placeholder="/images/events/example.jpg or https://..."
+                  />
+                  {errors.image && (
+                    <p className="mt-1 text-sm text-red-600">{errors.image}</p>
+                  )}
+
+                  {imagePreview && (
+                    <div className="mt-3">
+                      <div className="relative rounded-md overflow-hidden border border-gray-200 bg-gray-50">
                         <img
                           src={imagePreview}
                           alt="Event preview"
-                          className="w-full h-32 object-cover rounded-md"
-                        />
-                        <button
-                          type="button"
-                          onClick={removeImage}
-                          className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-                        >
-                          <X className="h-4 w-4" />
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="border-2 border-dashed border-gray-300 rounded-md p-6 text-center hover:border-gray-400 transition-colors relative">
-                        <Upload className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                        <p className="text-sm text-gray-600 mb-1">
-                          Click to upload or drag and drop
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          PNG, JPG, GIF up to 5MB
-                        </p>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleImageUpload}
-                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                          className="w-full h-32 object-cover"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                          }}
                         />
                       </div>
-                    )}
-                    {errors.image && (
-                      <p className="text-sm text-red-600">{errors.image}</p>
-                    )}
-                  </div>
+                      <button
+                        type="button"
+                        onClick={removeImage}
+                        className="mt-2 text-sm text-red-600 hover:text-red-700"
+                      >
+                        Remove image
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 {/* Featured Toggle */}

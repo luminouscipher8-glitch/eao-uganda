@@ -7,13 +7,22 @@ import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
-import { errorHandler } from './middleware/errorHandler.js';
-import { userRoutes } from './routes/users.js';
-import { contactRoutes } from './routes/contact.js';
-import { donationRoutes } from './routes/donations.js';
-import { analyticsRoutes } from './routes/analytics.js';
-import { healthRoutes } from './routes/health.js';
-import { adminRoutes } from './routes/admin.js';
+import { errorHandler } from './middleware/errorHandler';
+import { userRoutes } from './routes/users';
+import { contactRoutes } from './routes/contact';
+import { donationRoutes } from './routes/donations';
+import { analyticsRoutes } from './routes/analytics';
+import { healthRoutes } from './routes/health';
+import { adminRoutes } from './routes/admin';
+import { uploadRoutes } from './routes/uploads';
+import { paymentRoutes } from './routes/payments';
+import { programsRoutes } from './routes/programs';
+import { eventsRoutes } from './routes/events';
+import { successStoriesRoutes } from './routes/successStories';
+import { financialReportsRoutes } from './routes/financialReports';
+import { volunteerRoutes } from './routes/volunteers';
+import { newsletterRoutes } from './routes/newsletter';
+import { verificationRoutes } from './routes/verification';
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -37,8 +46,10 @@ app.use(limiter);
 const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [
     FRONTEND_URL,
     'http://localhost:5173',
+    'http://localhost:5174',
     'http://localhost:3000',
     'http://127.0.0.1:5173',
+    'http://127.0.0.1:5174',
     'http://127.0.0.1:3000'
 ];
 app.use(cors({
@@ -90,6 +101,16 @@ app.use('/api/contact', contactRoutes);
 app.use('/api/donations', donationRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/admin/upload', uploadRoutes);
+app.use('/api/payments', paymentRoutes);
+app.use('/api/verification', verificationRoutes);
+// Public API routes
+app.use('/api/programs', programsRoutes);
+app.use('/api/events', eventsRoutes);
+app.use('/api/success-stories', successStoriesRoutes);
+app.use('/api/financial-reports', financialReportsRoutes);
+app.use('/api/volunteers', volunteerRoutes);
+app.use('/api/newsletter', newsletterRoutes);
 // Root endpoint
 app.get('/', (req, res) => {
     res.json({

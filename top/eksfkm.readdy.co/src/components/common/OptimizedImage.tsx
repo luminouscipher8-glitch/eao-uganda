@@ -129,8 +129,13 @@ export default function OptimizedImage({
 
   return (
     <div
-      className={`relative overflow-hidden ${className}`}
-      style={{ width, height }}
+      className={`relative overflow-hidden sized-container ${className}`}
+      style={
+      {
+        '--container-width': width,
+        '--container-height': height,
+      } as React.CSSProperties
+    }
     >
       {/* Placeholder */}
       {!isLoaded && placeholder === 'blur' && (

@@ -1,13 +1,33 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  'https://rogxpucnkqwbeohpkolj.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJvZ3hwdWNua3F3YmVvaHBrb2xqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkyNzQwOTQsImV4cCI6MjA4NDg1MDA5NH0.TljQitsZXswDQTspvytNJrkz4eOEPWwX-ur2zOs9Ir4'
+// ✅ Minimal user type (only what you need)
+type SupabaseUser = {
+  id: string;
+  email?: string;
+  user_metadata?: {
+    role?: string;
+    [key: string]: any;
+  };
+  created_at?: string;
+};
+
+// ⚠️ Use ENV in real projects
+const SUPABASE_URL = 'https://merrqcqxvqvwfuohlxbs.supabase.co';
+
+// ✅ anon client (for login testing)
+const supabase: SupabaseClient = createClient(
+  SUPABASE_URL,
+  process.env.SUPABASE_ANON_KEY!
+);
+
+// ✅ service role client (for admin actions)
+const supabaseAdmin: SupabaseClient = createClient(
+  SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
 async function checkAdmin() {
   try {
-    // Try to sign in with common admin emails
     const adminEmails = [
       'admin@eao.ug',
       'admin@eksfkm.readdy.co',
@@ -17,45 +37,66 @@ async function checkAdmin() {
 
     for (const email of adminEmails) {
       console.log(`🔍 Checking ${email}...`);
-      
+
       try {
-        const { data, error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await (supabase.auth as any).signInWithPassword({
           email,
-          password: 'Admin123456!'
+          password: 'Admin123456!',
         });
 
-        if (data.user) {
+        if (error) {
+          console.log(`❌ ${email} failed: ${error.message}`);
+          continue;
+        }
+
+        if (data?.user) {
+          const user = data.user as SupabaseUser;
+
           console.log(`✅ Found admin user: ${email}`);
           console.log('User data:', {
-            id: data.user.id,
-            email: data.user.email,
-            role: data.user.user_metadata?.role,
-            created_at: data.user.created_at
+            id: user.id,
+            email: user.email,
+            role: user.user_metadata?.role,
+            created_at: user.created_at,
           });
           return;
         }
-      } catch (err) {
-        console.log(`❌ ${email} failed: ${err.message}`);
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : 'Unknown error';
+        console.log(`❌ ${email} failed: ${message}`);
       }
     }
 
     console.log('❌ No admin user found with common credentials');
-    
-    // List all users (if possible)
+
     try {
-      const { data: users, error } = await supabase.auth.admin.listUsers();
-      if (users) {
+      const { data, error } = await (supabaseAdmin.auth as any).admin.listUsers();
+
+      if (error) {
+        console.log(`❌ Cannot list users: ${error.message}`);
+        return;
+      }
+
+      if (data?.users) {
         console.log('📋 All users:');
-        users.forEach(user => {
-          console.log(`  - ${user.email} (role: ${user.user_metadata?.role || 'none'})`);
+
+        data.users.forEach((user: SupabaseUser) => {
+          console.log(
+            `  - ${user.email} (role: ${
+              user.user_metadata?.role || 'none'
+            })`
+          );
         });
       }
-    } catch (err) {
-      console.log('❌ Cannot list users (need service role key)');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unknown error';
+      console.log(
+        `❌ Cannot list users (need service role key): ${message}`
+      );
     }
-
-  } catch (error) {
-    console.error('❌ Error:', error);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    console.error('❌ Error:', message);
   }
 }
 

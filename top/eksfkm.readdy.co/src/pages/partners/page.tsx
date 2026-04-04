@@ -499,6 +499,8 @@ export default function PartnersPage() {
 
                 {/* Close Button */}
                 <button
+                type="button"
+  aria-label="Close partner details"
                   onClick={() => setSelectedPartner(null)}
                   className="absolute top-4 right-4 w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-all duration-200 shadow-lg hover:scale-110"
                 >

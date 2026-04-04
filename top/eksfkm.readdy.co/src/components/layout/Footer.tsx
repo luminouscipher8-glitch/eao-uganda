@@ -28,17 +28,19 @@ export default function Footer() {
             </p>
             <div className="flex gap-3 sm:gap-4">
               <a
-                href="https://facebook.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-9 h-9 sm:w-10 sm:h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-teal-600 transition-colors cursor-pointer"
-              >
-                <i className="ri-facebook-fill text-lg sm:text-xl"></i>
-              </a>
+  href="https://facebook.com"
+  target="_blank"
+  rel="noopener noreferrer"
+  aria-label="Visit our Facebook page"
+  className="w-9 h-9 sm:w-10 sm:h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-teal-600 transition-colors cursor-pointer"
+>
+  <i className="ri-facebook-fill text-lg sm:text-xl" aria-hidden="true"></i>
+</a>
               <a
                 href="https://twitter.com"
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Visit our Twitter page"
                 className="w-9 h-9 sm:w-10 sm:h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-teal-600 transition-colors cursor-pointer"
               >
                 <i className="ri-twitter-fill text-lg sm:text-xl"></i>
@@ -47,6 +49,7 @@ export default function Footer() {
                 href="https://instagram.com"
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Visit our Instagram page"
                 className="w-9 h-9 sm:w-10 sm:h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-teal-600 transition-colors cursor-pointer"
               >
                 <i className="ri-instagram-fill text-lg sm:text-xl"></i>
@@ -55,6 +58,7 @@ export default function Footer() {
                 href="https://linkedin.com"
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Visit our Linkedin page"
                 className="w-9 h-9 sm:w-10 sm:h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-teal-600 transition-colors cursor-pointer"
               >
                 <i className="ri-linkedin-fill text-lg sm:text-xl"></i>

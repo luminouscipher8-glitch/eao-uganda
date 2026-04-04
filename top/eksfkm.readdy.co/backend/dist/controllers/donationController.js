@@ -9,30 +9,29 @@ export class DonationController {
     createPayment = asyncHandler(async (req, res) => {
         const { amount, currency = 'UGX', message, isAnonymous = false, campaignId } = req.body;
         const userId = SupabaseAuth.extractUserId(req);
-        if (!amount || amount <= 0) {
+        if (!amount || Number(amount) <= 0) {
             throw new AppError('Valid donation amount is required', 400);
         }
-        // Generate unique transaction reference
         const txRef = `EOU-${Date.now()}-${crypto.randomBytes(8).toString('hex').toUpperCase()}`;
-        // Create donation record
         const donation = await db.createDonation({
-            amount,
+            amount: Number(amount),
             currency,
             flutterwaveTxRef: txRef,
             status: 'PENDING',
-            message,
-            isAnonymous,
-            userId,
-            campaignId,
+            message: message ?? null,
+            isAnonymous: Boolean(isAnonymous),
+            userId: userId ?? undefined,
+            campaignId: campaignId ?? undefined,
+            donorName: req.user?.email ? 'Authenticated Donor' : 'Anonymous Donor',
+            donorEmail: req.user?.email ?? undefined,
         });
-        // Flutterwave payment link creation
         const flutterwavePayload = {
             tx_ref: txRef,
-            amount: amount,
-            currency: currency,
+            amount: Number(amount),
+            currency,
             customer: {
                 email: req.user?.email || 'donor@educateanorphantuganda.org',
-                name: 'Anonymous Donor',
+                name: isAnonymous ? 'Anonymous Donor' : 'Anonymous Donor',
             },
             customizations: {
                 title: 'Educate an Orphan Uganda - Donation',
@@ -42,18 +41,17 @@ export class DonationController {
             redirect_url: `${process.env.FRONTEND_URL}/donation/success`,
             payment_options: 'card,mobilemoney,ussd,banktransfer',
         };
-        // In production, you would make an actual API call to Flutterwave
-        // For now, we'll return the payload for the frontend to handle
         const response = {
             success: true,
             data: {
                 donation,
-                paymentLink: `https://flutterwave.com/pay/${txRef}`, // Mock payment link
+                paymentLink: `https://flutterwave.com/pay/${txRef}`,
                 flutterwavePayload,
             },
             message: 'Payment intent created successfully',
         };
         res.status(201).json(response);
+        return;
     });
     /**
      * Verify Flutterwave webhook
@@ -64,29 +62,27 @@ export class DonationController {
         if (!signature || !secretHash) {
             throw new AppError('Invalid webhook signature', 401);
         }
-        // Verify webhook signature
         const hash = crypto.createHash('sha256').update(JSON.stringify(req.body)).digest('hex');
         if (hash !== signature) {
             throw new AppError('Invalid webhook signature', 401);
         }
         const { event, data } = req.body;
         if (event === 'charge.completed') {
-            // Update donation status
             await db.updateDonation(data.tx_ref, {
                 status: 'COMPLETED',
-                flutterwaveTransactionId: data.id,
-                paymentMethod: data.payment_type,
+                flutterwaveTransactionId: String(data.id),
+                paymentMethod: data.payment_type ?? null,
             });
         }
         else if (event === 'charge.failed') {
-            // Update donation status
             await db.updateDonation(data.tx_ref, {
                 status: 'FAILED',
-                flutterwaveTransactionId: data.id,
-                paymentMethod: data.payment_type,
+                flutterwaveTransactionId: String(data.id),
+                paymentMethod: data.payment_type ?? null,
             });
         }
         res.status(200).json({ status: 'success' });
+        return;
     });
     /**
      * Get donation by ID
@@ -108,8 +104,8 @@ export class DonationController {
         if (!donation) {
             throw new AppError('Donation not found', 404);
         }
-        // Users can only view their own donations unless admin
-        if (donation.userId !== userId && req.user?.role !== 'admin') {
+        const isAdmin = await SupabaseAuth.verifyAdminStatus(req.user?.userId || '');
+        if (donation.userId !== userId && !isAdmin) {
             throw new AppError('Insufficient permissions', 403);
         }
         const response = {
@@ -117,16 +113,17 @@ export class DonationController {
             data: { donation },
         };
         res.status(200).json(response);
+        return;
     });
     /**
-     * Get all donations (admin or user's own donations)
+     * Get all donations
      */
     getDonations = asyncHandler(async (req, res) => {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
         const userId = SupabaseAuth.extractUserId(req);
-        // Admins can see all donations, users only see their own
-        const targetUserId = req.user?.role === 'admin' ? undefined : userId;
+        const isAdmin = await SupabaseAuth.verifyAdminStatus(req.user?.userId || '');
+        const targetUserId = isAdmin ? undefined : userId;
         const { donations, total, pages, hasNext, hasPrev } = await db.getDonations({
             page,
             limit,
@@ -147,6 +144,7 @@ export class DonationController {
             },
         };
         res.status(200).json(response);
+        return;
     });
     /**
      * Get campaign donations
@@ -155,9 +153,10 @@ export class DonationController {
         const { campaignId } = req.params;
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
+        const where = campaignId ? { campaignId } : {};
         const [donations, total] = await Promise.all([
             db.prisma.donation.findMany({
-                where: campaignId ? { campaignId: campaignId } : {},
+                where,
                 skip: (page - 1) * limit,
                 take: limit,
                 orderBy: { createdAt: 'desc' },
@@ -170,7 +169,7 @@ export class DonationController {
                     },
                 },
             }),
-            db.prisma.donation.count({ where: campaignId ? { campaignId: campaignId } : {} }),
+            db.prisma.donation.count({ where }),
         ]);
         const response = {
             success: true,
@@ -187,6 +186,7 @@ export class DonationController {
             },
         };
         res.status(200).json(response);
+        return;
     });
 }
 //# sourceMappingURL=donationController.js.map

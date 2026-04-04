@@ -358,6 +358,7 @@ FormCheckbox.displayName = 'FormCheckbox';
 // Radio button group component
 export const FormRadioGroup = ({
   label,
+  name,
   required = false,
   disabled = false,
   error = false,
@@ -374,6 +375,7 @@ export const FormRadioGroup = ({
   helperTextClassName = '',
 }: {
   label?: string;
+  name: string;
   required?: boolean;
   disabled?: boolean;
   error?: boolean;
@@ -401,30 +403,39 @@ export const FormRadioGroup = ({
       )}
 
       <div className={`space-y-3 ${className}`}>
-        {options.map(option => (
-          <div key={option.value} className="flex items-center">
-            <input
-              type="radio"
-              value={option.value}
-              checked={value === option.value}
-              onChange={e => onChange?.(e.target.value)}
-              onBlur={onBlur}
-              onFocus={onFocus}
-              disabled={disabled || option.disabled}
-              className={`
-                h-5 w-5 text-teal-600 border-2 border-gray-300
-                focus:ring-2 focus:ring-teal-500 focus:ring-offset-2
-                ${error ? 'border-red-500' : ''}
-                ${disabled || option.disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-                ${radioClassName}
-              `}
-            />
-            <label className="ml-3 text-sm font-medium text-gray-700 cursor-pointer">
-              {option.label}
-            </label>
-          </div>
-        ))}
+  {options.map(option => {
+    const inputId = `radio-${name}-${option.value}`;
+
+    return (
+      <div key={option.value} className="flex items-center">
+        <input
+          id={inputId}
+          name={name}
+          type="radio"
+          value={option.value}
+          checked={value === option.value}
+          onChange={e => onChange?.(e.target.value)}
+          onBlur={onBlur}
+          onFocus={onFocus}
+          disabled={disabled || option.disabled}
+          className={`
+            h-5 w-5 text-teal-600 border-2 border-gray-300
+            focus:ring-2 focus:ring-teal-500 focus:ring-offset-2
+            ${error ? 'border-red-500' : ''}
+            ${disabled || option.disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+            ${radioClassName}
+          `}
+        />
+        <label
+          htmlFor={inputId}
+          className="ml-3 text-sm font-medium text-gray-700 cursor-pointer"
+        >
+          {option.label}
+        </label>
       </div>
+    );
+  })}
+</div>
 
       {helperText && (
         <p

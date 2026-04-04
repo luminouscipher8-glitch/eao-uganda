@@ -1,15 +1,11 @@
-// import React from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  BookOpen, 
-  Newspaper, 
-  MessageSquare, 
-  Heart, 
-  Users, 
-  BarChart3,
+import {
+  BookOpen,
+  CalendarDays,
+  Building2,
+  Sparkles,
   Plus,
   Edit,
-  // Trash2
 } from 'lucide-react';
 import AdminLayout from '../../../components/admin/AdminLayout';
 import { ProtectedRoute } from '../../../components/admin/ProtectedRoute';
@@ -52,87 +48,64 @@ export default function AdminDashboard() {
 
   const statCards = [
     {
-      title: 'Total Programs',
-      value: (stats as any).totalPrograms?.toString() || '0',
-      change: '+2 this month',
+      title: 'Programs',
+      value: stats.totalPrograms?.toString() || '0',
+      note: 'Active content area',
       icon: BookOpen,
       color: 'bg-blue-500',
       link: '/admin/programs'
     },
     {
-      title: 'News Articles',
-      value: (stats as any).totalNews?.toString() || '0',
-      change: '+5 this month',
-      icon: Newspaper,
-      color: 'bg-green-500',
-      link: '/admin/news'
-    },
-    {
-      title: 'Contact Messages',
-      value: (stats as any).totalContacts?.toString() || '0',
-      change: '+12 this week',
-      icon: MessageSquare,
+      title: 'Contacts',
+      value: stats.totalContacts?.toString() || '0',
+      note: 'Stored contact submissions',
+      icon: CalendarDays,
       color: 'bg-purple-500',
-      link: '/admin/contacts'
+      link: '/admin'
     },
     {
-      title: 'Total Donations',
-      value: `UGX ${((stats as any).totalDonations || 0).toLocaleString()}`,
-      change: '+UGX 3,200,000 this month',
-      icon: Heart,
+      title: 'Donations',
+      value: stats.totalDonations?.toString() || '0',
+      note: 'Donation records',
+      icon: Sparkles,
       color: 'bg-red-500',
-      link: '/admin/donations'
+      link: '/admin'
     },
     {
       title: 'Volunteers',
-      value: (stats as any).totalVolunteers?.toString() || '0',
-      change: '+8 this month',
-      icon: Users,
+      value: stats.totalVolunteers?.toString() || '0',
+      note: 'Volunteer submissions',
+      icon: Building2,
       color: 'bg-yellow-500',
-      link: '/admin/volunteers'
-    },
-    {
-      title: 'Analytics',
-      value: (stats as any).totalVisitors?.toString() || '0',
-      change: 'Visitors this week',
-      icon: BarChart3,
-      color: 'bg-indigo-500',
-      link: '/admin/analytics'
+      link: '/admin'
     }
   ];
 
   const quickActions = [
     {
-      title: 'Add New Program',
-      description: 'Create a new educational program',
+      title: 'Manage Programs',
+      description: 'Create and update program content',
       icon: Plus,
-      link: '/admin/programs?action=new',
+      link: '/admin/programs',
       color: 'bg-blue-100 text-blue-700 hover:bg-blue-200'
     },
     {
-      title: 'Write News Article',
-      description: 'Publish a news update or announcement',
+      title: 'Review Dashboard',
+      description: 'Check latest system totals and status',
       icon: Edit,
-      link: '/admin/news?action=new',
+      link: '/admin',
       color: 'bg-green-100 text-green-700 hover:bg-green-200'
-    },
-    {
-      title: 'View Contacts',
-      description: 'Manage contact form submissions',
-      icon: MessageSquare,
-      link: '/admin/contacts',
-      color: 'bg-purple-100 text-purple-700 hover:bg-purple-200'
     }
   ];
 
-  const recentActivity = (stats as any).recentActivity || [];
+  const recentActivity = stats.recentActivity || [];
 
   return (
     <ProtectedRoute>
       <AdminLayout>
         <div className="max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
           {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-6">
             {statCards.map((stat, index) => (
               <Link
                 key={index}
@@ -143,7 +116,7 @@ export default function AdminDashboard() {
                   <div>
                     <p className="text-sm font-medium text-gray-600">{stat.title}</p>
                     <p className="text-2xl font-bold text-gray-900 mt-1">{stat.value}</p>
-                    <p className="text-sm text-green-600 mt-1">{stat.change}</p>
+                    <p className="text-sm text-gray-500 mt-1">{stat.note}</p>
                   </div>
                   <div className={`p-3 rounded-lg ${stat.color}`}>
                     <stat.icon className="h-6 w-6 text-white" />
@@ -180,17 +153,17 @@ export default function AdminDashboard() {
             <div className="lg:col-span-2">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h2>
               <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-                <div className="divide-y divide-gray-200">
-                  {recentActivity.map((activity: any) => {
-                    const IconComponent = activity.icon === 'Heart' ? Heart :
-                                       activity.icon === 'MessageSquare' ? MessageSquare :
-                                       activity.icon === 'Users' ? Users :
-                                       BookOpen;
-                    return (
+                {recentActivity.length === 0 ? (
+                  <div className="p-6 text-sm text-gray-500">
+                    No recent activity is available yet.
+                  </div>
+                ) : (
+                  <div className="divide-y divide-gray-200">
+                    {recentActivity.map((activity: any) => (
                       <div key={activity.id} className="p-4 flex items-center gap-4">
                         <div className="flex-shrink-0">
                           <div className="p-2 bg-gray-100 rounded-lg">
-                            <IconComponent className="h-5 w-5 text-gray-600" />
+                            <BookOpen className="h-5 w-5 text-gray-600" />
                           </div>
                         </div>
                         <div className="flex-1 min-w-0">
@@ -200,9 +173,9 @@ export default function AdminDashboard() {
                           <p className="text-sm text-gray-500">{activity.time}</p>
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>

@@ -1,33 +1,28 @@
 import { useState, useEffect } from 'react';
-import { 
-  Save, 
-  Upload, 
-  X, 
+import {
+  Save,
   AlertCircle,
   BookOpen,
-  Heart,
   Users,
-  Building
+  Building2,
 } from 'lucide-react';
 import { useAdminApi } from '../../hooks/useAdminApi';
-import { ProgramFormData } from '../../services/adminApi';
+import { Program } from '../../services/adminApi';
 import Modal from './Modal';
 
 const categoryIcons = {
   education: BookOpen,
-  healthcare: Heart,
   community: Users,
-  building: Building,
+  building: Building2,
 };
 
 const getCategoryColorClasses = (category: string, isSelected: boolean) => {
   if (!isSelected) return 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50';
-  
+
   switch (category) {
     case 'education':
       return 'border-teal-500 bg-teal-50 text-teal-700';
-    case 'healthcare':
-      return 'border-red-500 bg-red-50 text-red-700';
+
     case 'community':
       return 'border-blue-500 bg-blue-50 text-blue-700';
     case 'building':
@@ -37,6 +32,14 @@ const getCategoryColorClasses = (category: string, isSelected: boolean) => {
   }
 };
 
+interface ProgramFormData {
+  title: string;
+  description: string;
+  category: 'education' | 'community' | 'building';
+  impact: string;
+  image: string;
+}
+
 interface ProgramModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -44,14 +47,19 @@ interface ProgramModalProps {
   onSuccess: () => void;
 }
 
-export default function ProgramModal({ isOpen, onClose, programId, onSuccess }: ProgramModalProps) {
+export default function ProgramModal({
+  isOpen,
+  onClose,
+  programId,
+  onSuccess,
+}: ProgramModalProps) {
   const { programs: programsApi } = useAdminApi();
-  
+
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [previewMode, setPreviewMode] = useState(false);
-  
+
   const [formData, setFormData] = useState<ProgramFormData>({
     title: '',
     description: '',
@@ -60,7 +68,6 @@ export default function ProgramModal({ isOpen, onClose, programId, onSuccess }: 
     image: '',
   });
 
-  const [imagePreview, setImagePreview] = useState<string>('');
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
@@ -83,7 +90,6 @@ export default function ProgramModal({ isOpen, onClose, programId, onSuccess }: 
       impact: '',
       image: '',
     });
-    setImagePreview('');
     setErrors({});
     setPreviewMode(false);
   };
@@ -92,17 +98,16 @@ export default function ProgramModal({ isOpen, onClose, programId, onSuccess }: 
     try {
       setLoading(true);
       const response = await programsApi.getPrograms();
-      const program = response.data?.find(p => p.id === programId);
-      
+      const program = response.data?.find((p: Program) => p.id === programId);
+
       if (program) {
         setFormData({
           title: program.title,
           description: program.description,
-          category: program.category,
+          category: program.category as ProgramFormData['category'],
           impact: program.impact,
           image: program.image,
         });
-        setImagePreview(program.image);
       }
     } catch (error) {
       console.error('Failed to fetch program:', error);
@@ -113,37 +118,37 @@ export default function ProgramModal({ isOpen, onClose, programId, onSuccess }: 
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
-    
+
     if (!formData.title.trim()) {
       newErrors.title = 'Program title is required';
     }
-    
+
     if (!formData.description.trim()) {
       newErrors.description = 'Description is required';
     }
-    
+
     if (!formData.impact.trim()) {
       newErrors.impact = 'Impact statement is required';
     }
-    
+
     if (!formData.image.trim()) {
       newErrors.image = 'Program image is required';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
 
     try {
       setSaving(true);
-      
+
       let response;
       if (isEditing && programId) {
         response = await programsApi.updateProgram(programId, formData);
@@ -163,28 +168,13 @@ export default function ProgramModal({ isOpen, onClose, programId, onSuccess }: 
     }
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        setErrors({ image: 'Image size must be less than 5MB' });
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const result = reader.result as string;
-        setImagePreview(result);
-        setFormData(prev => ({ ...prev, image: result }));
-        setErrors(prev => ({ ...prev, image: '' }));
-      };
-      reader.readAsDataURL(file);
-    }
+  const removeImage = () => {
+    setFormData((prev) => ({ ...prev, image: '' }));
   };
 
-  const removeImage = () => {
-    setImagePreview('');
-    setFormData(prev => ({ ...prev, image: '' }));
+  const handleImageChange = (url: string) => {
+    setFormData((prev) => ({ ...prev, image: url }));
+    setErrors((prev) => ({ ...prev, image: '' }));
   };
 
   if (loading) {
@@ -214,16 +204,16 @@ export default function ProgramModal({ isOpen, onClose, programId, onSuccess }: 
 
         <div className="flex items-center justify-between mb-6">
           <p className="text-sm text-gray-700">
-            {isEditing 
+            {isEditing
               ? 'Update program details and impact information.'
-              : 'Add a new educational program to showcase your impact.'
-            }
+              : 'Add a new educational program to showcase your impact.'}
           </p>
           <button
+            type="button"
             onClick={() => setPreviewMode(!previewMode)}
             className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-              previewMode 
-                ? 'bg-teal-100 text-teal-700' 
+              previewMode
+                ? 'bg-teal-100 text-teal-700'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
@@ -232,12 +222,11 @@ export default function ProgramModal({ isOpen, onClose, programId, onSuccess }: 
         </div>
 
         {previewMode ? (
-          /* Preview Mode */
           <div className="bg-white rounded-lg border border-gray-200">
             <div className="aspect-w-16 aspect-h-9 bg-gray-100">
-              {imagePreview ? (
+              {formData.image ? (
                 <img
-                  src={imagePreview}
+                  src={formData.image}
                   alt={formData.title}
                   className="w-full h-48 object-cover"
                 />
@@ -247,6 +236,7 @@ export default function ProgramModal({ isOpen, onClose, programId, onSuccess }: 
                 </div>
               )}
             </div>
+
             <div className="p-6">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">
@@ -257,33 +247,35 @@ export default function ProgramModal({ isOpen, onClose, programId, onSuccess }: 
                     {formData.category && (
                       <>
                         {(() => {
-                          const Icon = categoryIcons[formData.category as keyof typeof categoryIcons];
+                          const Icon = categoryIcons[formData.category];
                           return <Icon className="h-3 w-3 text-gray-500" />;
                         })()}
-                        <span className="text-sm text-gray-500 capitalize">{formData.category}</span>
+                        <span className="text-sm text-gray-500 capitalize">
+                          {formData.category}
+                        </span>
                       </>
                     )}
                   </div>
                 </div>
+
                 <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
                   Active
                 </span>
               </div>
+
               <p className="text-sm text-gray-700 mb-4">
                 {formData.description || 'Program description will appear here...'}
               </p>
+
               <div className="text-xs text-teal-600 font-medium">
                 {formData.impact || 'Impact statement will appear here...'}
               </div>
             </div>
           </div>
         ) : (
-          /* Edit Mode */
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Main Content */}
               <div className="lg:col-span-2 space-y-6">
-                {/* Title */}
                 <div>
                   <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
                     Program Title <span className="text-red-500">*</span>
@@ -292,18 +284,15 @@ export default function ProgramModal({ isOpen, onClose, programId, onSuccess }: 
                     type="text"
                     id="title"
                     value={formData.title}
-                    onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, title: e.target.value }))}
                     className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm ${
                       errors.title ? 'border-red-300' : 'border-gray-300'
                     }`}
                     placeholder="e.g., School Lunch Program"
                   />
-                  {errors.title && (
-                    <p className="mt-1 text-sm text-red-600">{errors.title}</p>
-                  )}
+                  {errors.title && <p className="mt-1 text-sm text-red-600">{errors.title}</p>}
                 </div>
 
-                {/* Description */}
                 <div>
                   <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
                     Description <span className="text-red-500">*</span>
@@ -312,7 +301,7 @@ export default function ProgramModal({ isOpen, onClose, programId, onSuccess }: 
                     id="description"
                     rows={6}
                     value={formData.description}
-                    onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
                     className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm ${
                       errors.description ? 'border-red-300' : 'border-gray-300'
                     }`}
@@ -323,7 +312,6 @@ export default function ProgramModal({ isOpen, onClose, programId, onSuccess }: 
                   )}
                 </div>
 
-                {/* Impact */}
                 <div>
                   <label htmlFor="impact" className="block text-sm font-medium text-gray-700 mb-2">
                     Impact Statement <span className="text-red-500">*</span>
@@ -332,21 +320,17 @@ export default function ProgramModal({ isOpen, onClose, programId, onSuccess }: 
                     id="impact"
                     rows={3}
                     value={formData.impact}
-                    onChange={(e) => setFormData(prev => ({ ...prev, impact: e.target.value }))}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, impact: e.target.value }))}
                     className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm ${
                       errors.impact ? 'border-red-300' : 'border-gray-300'
                     }`}
                     placeholder="e.g., Providing daily nutritious meals to 500+ students"
                   />
-                  {errors.impact && (
-                    <p className="mt-1 text-sm text-red-600">{errors.impact}</p>
-                  )}
+                  {errors.impact && <p className="mt-1 text-sm text-red-600">{errors.impact}</p>}
                 </div>
               </div>
 
-              {/* Sidebar */}
               <div className="space-y-6">
-                {/* Category */}
                 <div>
                   <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
                     Category
@@ -356,8 +340,16 @@ export default function ProgramModal({ isOpen, onClose, programId, onSuccess }: 
                       <button
                         key={key}
                         type="button"
-                        onClick={() => setFormData(prev => ({ ...prev, category: key as any }))}
-                        className={`flex items-center gap-2 p-3 border rounded-md text-sm font-medium transition-colors ${getCategoryColorClasses(key, formData.category === key)}`}
+                        onClick={() =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            category: key as ProgramFormData['category'],
+                          }))
+                        }
+                        className={`flex items-center gap-2 p-3 border rounded-md text-sm font-medium transition-colors ${getCategoryColorClasses(
+                          key,
+                          formData.category === key
+                        )}`}
                       >
                         <Icon className="h-4 w-4" />
                         <span className="capitalize">{key}</span>
@@ -366,51 +358,45 @@ export default function ProgramModal({ isOpen, onClose, programId, onSuccess }: 
                   </div>
                 </div>
 
-                {/* Image Upload */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Program Image <span className="text-red-500">*</span>
+                  <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-2">
+                    Program Image URL <span className="text-red-500">*</span>
                   </label>
-                  <div className="space-y-3">
-                    {imagePreview ? (
-                      <div className="relative">
+                  <input
+                    type="text"
+                    id="image"
+                    value={formData.image}
+                    onChange={(e) => handleImageChange(e.target.value)}
+                    className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm ${
+                      errors.image ? 'border-red-300' : 'border-gray-300'
+                    }`}
+                    placeholder="/images/programs/example.jpg or https://..."
+                  />
+                  {errors.image && <p className="mt-1 text-sm text-red-600">{errors.image}</p>}
+
+                  {formData.image && (
+                    <div className="mt-3">
+                      <div className="relative rounded-md overflow-hidden border border-gray-200 bg-gray-50">
                         <img
-                          src={imagePreview}
+                          src={formData.image}
                           alt="Program preview"
-                          className="w-full h-32 object-cover rounded-md"
-                        />
-                        <button
-                          type="button"
-                          onClick={removeImage}
-                          className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-                        >
-                          <X className="h-4 w-4" />
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="border-2 border-dashed border-gray-300 rounded-md p-6 text-center hover:border-gray-400 transition-colors relative">
-                        <Upload className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                        <p className="text-sm text-gray-600 mb-1">
-                          Click to upload or drag and drop
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          PNG, JPG, GIF up to 5MB
-                        </p>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleImageUpload}
-                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                          className="w-full h-40 object-cover"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                          }}
                         />
                       </div>
-                    )}
-                    {errors.image && (
-                      <p className="text-sm text-red-600">{errors.image}</p>
-                    )}
-                  </div>
+                      <button
+                        type="button"
+                        onClick={removeImage}
+                        className="mt-2 text-sm text-red-600 hover:text-red-700"
+                      >
+                        Remove image
+                      </button>
+                    </div>
+                  )}
                 </div>
 
-                {/* Guidelines */}
                 <div className="bg-teal-50 border border-teal-200 rounded-md p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <BookOpen className="h-4 w-4 text-teal-600" />
@@ -418,16 +404,15 @@ export default function ProgramModal({ isOpen, onClose, programId, onSuccess }: 
                   </div>
                   <ul className="text-xs text-teal-700 space-y-1">
                     <li>• Focus on measurable impact</li>
-                    <li>• Include clear objectives</li>
-                    <li>• Target specific beneficiaries</li>
-                    <li>• Highlight sustainability</li>
-                    <li>• Use compelling imagery</li>
+                    <li>• Keep the description clear and specific</li>
+                    <li>• Use a real image URL for now</li>
+                    <li>• Match the category to the program focus</li>
+                    <li>• Highlight who benefits from the program</li>
                   </ul>
                 </div>
               </div>
             </div>
 
-            {/* Actions */}
             <div className="flex items-center justify-end gap-3 pt-6 border-t border-gray-200">
               <button
                 type="button"
@@ -436,6 +421,7 @@ export default function ProgramModal({ isOpen, onClose, programId, onSuccess }: 
               >
                 Cancel
               </button>
+
               <button
                 type="submit"
                 disabled={saving}

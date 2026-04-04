@@ -1,66 +1,73 @@
-import jwt from 'jsonwebtoken';
-import { createClient } from '@supabase/supabase-js';
+import * as jwt from 'jsonwebtoken';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  'https://rogxpucnkqwbeohpkolj.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJvZ3hwdWNua3F3YmVvaHBrb2xqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkyNzQwOTQsImV4cCI6MjA4NDg1MDA5NH0.TljQitsZXswDQTspvytNJrkz4eOEPWwX-ur2zOs9Ir4'
+// ✅ ENV variables (recommended)
+const SUPABASE_URL = process.env.SUPABASE_URL!;
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY!;
+const JWT_SECRET = process.env.SUPABASE_JWT_SECRET!;
+
+// ✅ Correct client
+const supabase: SupabaseClient = createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY
 );
 
 async function debugToken() {
   try {
     console.log('🔍 Debugging token verification...');
-    
-    // Get a real token
-    const { data, error } = await supabase.auth.signInWithPassword({
+
+    // ✅ Fix TS issue
+    const { data, error } = await (supabase.auth as any).signInWithPassword({
       email: 'admin@eao.ug',
-      password: 'Admin123456!'
+      password: 'Admin123456!',
     });
 
     if (error) {
-      console.error('❌ Login error:', error);
+      console.error('❌ Login error:', error.message);
       return;
     }
 
-    const token = data.session?.access_token;
+    const token = data?.session?.access_token;
+
     if (!token) {
       console.error('❌ No token found');
       return;
     }
 
     console.log('🎯 Full token:', token);
-    
-    // Decode without verification first
+
+    // ✅ Decode (no verification)
     const decoded = jwt.decode(token, { complete: true });
     console.log('📋 Decoded token:', JSON.stringify(decoded, null, 2));
-    
-    // Now try verification with different issuer formats
-    const jwtSecret = 'dbO7q1fen6LtfDoxntOS+hkZM4PdIyG/+ymstIcDb3K7poAA8+UtUatPW050iwsREb1nTdxUxjveCtII9/r7DA==';
-    
+
     console.log('\n🔧 Testing verification with different issuers...');
-    
+
+    // ✅ Correct issuer formats
+    const baseUrl = SUPABASE_URL.replace(/\/$/, '');
+
     const issuers = [
-      'https://rogxpucnkqwbeohpkolj.supabase.co/auth/v1',
-      'https://rogxpucnkqwbeohpkolj.supabase.co',
-      'rogxpucnkqwbeohpkolj.supabase.co/auth/v1',
-      'rogxpucnkqwbeohpkolj.supabase.co'
+      `${baseUrl}/auth/v1`,
+      baseUrl,
     ];
-    
+
     for (const issuer of issuers) {
       try {
-        const verified = jwt.verify(token, jwtSecret, {
+        const verified = jwt.verify(token, JWT_SECRET, {
           algorithms: ['HS256'],
-          issuer: issuer
+          issuer: issuer,
         });
+
         console.log(`✅ Success with issuer: ${issuer}`);
         console.log('Verified payload:', verified);
         break;
-      } catch (err) {
-        console.log(`❌ Failed with issuer: ${issuer} - ${err.message}`);
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : 'Unknown error';
+        console.log(`❌ Failed with issuer: ${issuer} - ${message}`);
       }
     }
-    
-  } catch (error) {
-    console.error('❌ Error:', error);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    console.error('❌ Error:', message);
   }
 }
 

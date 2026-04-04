@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
-import { 
-  Save, 
-  Upload, 
-  X, 
+import {
+  Save,
   AlertCircle,
   Award,
   Star,
@@ -22,7 +20,7 @@ const categoryIcons = {
 
 const getCategoryColorClasses = (category: string, isSelected: boolean) => {
   if (!isSelected) return 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50';
-  
+
   switch (category) {
     case 'education':
       return 'border-teal-500 bg-teal-50 text-teal-700';
@@ -42,14 +40,19 @@ interface SuccessStoryModalProps {
   onSuccess: () => void;
 }
 
-export default function SuccessStoryModal({ isOpen, onClose, storyId, onSuccess }: SuccessStoryModalProps) {
+export default function SuccessStoryModal({
+  isOpen,
+  onClose,
+  storyId,
+  onSuccess
+}: SuccessStoryModalProps) {
   const { successStories: successStoriesApi } = useAdminApi();
-  
+
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [previewMode, setPreviewMode] = useState(false);
-  
+
   const [formData, setFormData] = useState<SuccessStoryFormData>({
     student_name: '',
     age: 0,
@@ -97,7 +100,7 @@ export default function SuccessStoryModal({ isOpen, onClose, storyId, onSuccess 
       setLoading(true);
       const response = await successStoriesApi.getSuccessStories();
       const story = response.data?.find((s: SuccessStory) => s.id === storyId);
-      
+
       if (story) {
         setFormData({
           student_name: story.student_name,
@@ -105,11 +108,11 @@ export default function SuccessStoryModal({ isOpen, onClose, storyId, onSuccess 
           story: story.story,
           impact: story.impact,
           category: story.category,
-          image: story.image,
+          image: story.image || '',
           is_featured: story.is_featured,
           status: story.status,
         });
-        setImagePreview(story.image);
+        setImagePreview(story.image || '');
       }
     } catch (error) {
       console.error('Failed to fetch story:', error);
@@ -120,41 +123,41 @@ export default function SuccessStoryModal({ isOpen, onClose, storyId, onSuccess 
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
-    
+
     if (!formData.student_name.trim()) {
       newErrors.student_name = 'Student name is required';
     }
-    
+
     if (formData.age < 5 || formData.age > 25) {
       newErrors.age = 'Age must be between 5 and 25';
     }
-    
+
     if (!formData.story.trim()) {
       newErrors.story = 'Student story is required';
     }
-    
+
     if (!formData.impact.trim()) {
       newErrors.impact = 'Impact statement is required';
     }
-    
-    if (!formData.image.trim()) {
+
+    if (!(formData.image || '').trim()) {
       newErrors.image = 'Student photo is required';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
 
     try {
       setSaving(true);
-      
+
       let response;
       if (isEditing && storyId) {
         response = await successStoriesApi.updateSuccessStory(storyId, formData);
@@ -174,23 +177,10 @@ export default function SuccessStoryModal({ isOpen, onClose, storyId, onSuccess 
     }
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        setErrors({ image: 'Image size must be less than 5MB' });
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const result = reader.result as string;
-        setImagePreview(result);
-        setFormData((prev: SuccessStoryFormData) => ({ ...prev, image: result }));
-        setErrors((prev: Record<string, string>) => ({ ...prev, image: '' }));
-      };
-      reader.readAsDataURL(file);
-    }
+  const handleImageChange = (url: string) => {
+    setImagePreview(url);
+    setFormData((prev: SuccessStoryFormData) => ({ ...prev, image: url }));
+    setErrors((prev: Record<string, string>) => ({ ...prev, image: '' }));
   };
 
   const removeImage = () => {
@@ -225,16 +215,15 @@ export default function SuccessStoryModal({ isOpen, onClose, storyId, onSuccess 
 
         <div className="flex items-center justify-between mb-6">
           <p className="text-sm text-gray-700">
-            {isEditing 
+            {isEditing
               ? 'Update student story and impact information.'
-              : 'Share an inspiring story of student achievement and transformation.'
-            }
+              : 'Share an inspiring story of student achievement and transformation.'}
           </p>
           <button
             onClick={() => setPreviewMode(!previewMode)}
             className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-              previewMode 
-                ? 'bg-purple-100 text-purple-700' 
+              previewMode
+                ? 'bg-purple-100 text-purple-700'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
@@ -243,22 +232,20 @@ export default function SuccessStoryModal({ isOpen, onClose, storyId, onSuccess 
         </div>
 
         {previewMode ? (
-          /* Preview Mode */
           <div className="bg-white rounded-lg border border-gray-200">
             <div className="aspect-square relative overflow-hidden">
               {imagePreview ? (
                 <img
                   src={imagePreview}
                   alt={formData.student_name}
-                  className="w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-500"
+                  className="w-full h-full object-cover object-top"
                 />
               ) : (
                 <div className="w-full h-full bg-gray-200 flex items-center justify-center">
                   <Award className="h-12 w-12 text-gray-400" />
                 </div>
               )}
-              
-              {/* Featured Badge */}
+
               {formData.is_featured && (
                 <div className="absolute top-2 right-2">
                   <span className="px-2 py-1 text-xs font-medium rounded-full bg-amber-100 text-amber-800">
@@ -268,7 +255,7 @@ export default function SuccessStoryModal({ isOpen, onClose, storyId, onSuccess 
                 </div>
               )}
             </div>
-            
+
             <div className="p-6">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">
@@ -284,11 +271,11 @@ export default function SuccessStoryModal({ isOpen, onClose, storyId, onSuccess 
                   </div>
                 </div>
               </div>
-              
+
               <p className="text-gray-700 mb-4">
                 {formData.story || 'Student story will appear here...'}
               </p>
-              
+
               <div className="bg-purple-50 border border-purple-200 rounded-md p-4">
                 <h4 className="font-medium text-purple-900 mb-2">Impact</h4>
                 <p className="text-sm text-purple-800">
@@ -298,12 +285,9 @@ export default function SuccessStoryModal({ isOpen, onClose, storyId, onSuccess 
             </div>
           </div>
         ) : (
-          /* Edit Mode */
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Main Content */}
               <div className="lg:col-span-2 space-y-6">
-                {/* Student Name and Age */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="student_name" className="block text-sm font-medium text-gray-700 mb-2">
@@ -334,7 +318,12 @@ export default function SuccessStoryModal({ isOpen, onClose, storyId, onSuccess 
                       min="5"
                       max="25"
                       value={formData.age}
-                      onChange={(e) => setFormData((prev: SuccessStoryFormData) => ({ ...prev, age: parseInt(e.target.value) || 0 }))}
+                      onChange={(e) =>
+                        setFormData((prev: SuccessStoryFormData) => ({
+                          ...prev,
+                          age: parseInt(e.target.value, 10) || 0,
+                        }))
+                      }
                       className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm ${
                         errors.age ? 'border-red-300' : 'border-gray-300'
                       }`}
@@ -346,7 +335,6 @@ export default function SuccessStoryModal({ isOpen, onClose, storyId, onSuccess 
                   </div>
                 </div>
 
-                {/* Story */}
                 <div>
                   <label htmlFor="story" className="block text-sm font-medium text-gray-700 mb-2">
                     Student Story <span className="text-red-500">*</span>
@@ -366,7 +354,6 @@ export default function SuccessStoryModal({ isOpen, onClose, storyId, onSuccess 
                   )}
                 </div>
 
-                {/* Impact */}
                 <div>
                   <label htmlFor="impact" className="block text-sm font-medium text-gray-700 mb-2">
                     Impact Statement <span className="text-red-500">*</span>
@@ -387,9 +374,7 @@ export default function SuccessStoryModal({ isOpen, onClose, storyId, onSuccess 
                 </div>
               </div>
 
-              {/* Sidebar */}
               <div className="space-y-6">
-                {/* Category */}
                 <div>
                   <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
                     Category
@@ -399,8 +384,16 @@ export default function SuccessStoryModal({ isOpen, onClose, storyId, onSuccess 
                       <button
                         key={key}
                         type="button"
-                        onClick={() => setFormData((prev: SuccessStoryFormData) => ({ ...prev, category: key as any }))}
-                        className={`flex items-center gap-2 p-3 border rounded-md text-sm font-medium transition-colors ${getCategoryColorClasses(key, formData.category === key)}`}
+                        onClick={() =>
+                          setFormData((prev: SuccessStoryFormData) => ({
+                            ...prev,
+                            category: key as any,
+                          }))
+                        }
+                        className={`flex items-center gap-2 p-3 border rounded-md text-sm font-medium transition-colors ${getCategoryColorClasses(
+                          key,
+                          formData.category === key
+                        )}`}
                       >
                         <Icon className="h-4 w-4" />
                         <span className="capitalize">{key}</span>
@@ -409,7 +402,6 @@ export default function SuccessStoryModal({ isOpen, onClose, storyId, onSuccess 
                   </div>
                 </div>
 
-                {/* Status */}
                 <div>
                   <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-2">
                     Publication Status
@@ -417,7 +409,12 @@ export default function SuccessStoryModal({ isOpen, onClose, storyId, onSuccess 
                   <select
                     id="status"
                     value={formData.status}
-                    onChange={(e) => setFormData((prev: SuccessStoryFormData) => ({ ...prev, status: e.target.value as any }))}
+                    onChange={(e) =>
+                      setFormData((prev: SuccessStoryFormData) => ({
+                        ...prev,
+                        status: e.target.value as any,
+                      }))
+                    }
                     className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
                   >
                     <option value="draft">Draft</option>
@@ -426,58 +423,59 @@ export default function SuccessStoryModal({ isOpen, onClose, storyId, onSuccess 
                   </select>
                 </div>
 
-                {/* Image Upload */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Student Photo <span className="text-red-500">*</span>
+                  <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-2">
+                    Student Photo URL <span className="text-red-500">*</span>
                   </label>
-                  <div className="space-y-3">
-                    {imagePreview ? (
-                      <div className="relative">
+                  <input
+                    type="text"
+                    id="image"
+                    value={formData.image || ''}
+                    onChange={(e) => handleImageChange(e.target.value)}
+                    className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm ${
+                      errors.image ? 'border-red-300' : 'border-gray-300'
+                    }`}
+                    placeholder="/images/success-stories/example.jpg or https://..."
+                  />
+                  {errors.image && (
+                    <p className="mt-1 text-sm text-red-600">{errors.image}</p>
+                  )}
+
+                  {imagePreview && (
+                    <div className="mt-3">
+                      <div className="relative rounded-md overflow-hidden border border-gray-200 bg-gray-50">
                         <img
                           src={imagePreview}
                           alt="Student preview"
-                          className="w-full h-32 object-cover rounded-md"
-                        />
-                        <button
-                          type="button"
-                          onClick={removeImage}
-                          className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-                        >
-                          <X className="h-4 w-4" />
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="border-2 border-dashed border-gray-300 rounded-md p-6 text-center hover:border-gray-400 transition-colors relative">
-                        <Upload className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                        <p className="text-sm text-gray-600 mb-1">
-                          Click to upload or drag and drop
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          PNG, JPG, GIF up to 5MB
-                        </p>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleImageUpload}
-                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                          className="w-full h-32 object-cover"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                          }}
                         />
                       </div>
-                    )}
-                    {errors.image && (
-                      <p className="text-sm text-red-600">{errors.image}</p>
-                    )}
-                  </div>
+                      <button
+                        type="button"
+                        onClick={removeImage}
+                        className="mt-2 text-sm text-red-600 hover:text-red-700"
+                      >
+                        Remove image
+                      </button>
+                    </div>
+                  )}
                 </div>
 
-                {/* Featured Toggle */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Featured Story
                   </label>
                   <button
                     type="button"
-                    onClick={() => setFormData((prev: SuccessStoryFormData) => ({ ...prev, is_featured: !prev.is_featured }))}
+                    onClick={() =>
+                      setFormData((prev: SuccessStoryFormData) => ({
+                        ...prev,
+                        is_featured: !prev.is_featured,
+                      }))
+                    }
                     className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                       formData.is_featured
                         ? 'bg-amber-100 text-amber-700 border-amber-200'
@@ -489,7 +487,6 @@ export default function SuccessStoryModal({ isOpen, onClose, storyId, onSuccess 
                   </button>
                 </div>
 
-                {/* Guidelines */}
                 <div className="bg-purple-50 border border-purple-200 rounded-md p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <Award className="h-4 w-4 text-purple-600" />
@@ -499,14 +496,13 @@ export default function SuccessStoryModal({ isOpen, onClose, storyId, onSuccess 
                     <li>• Focus on transformation and growth</li>
                     <li>• Include specific achievements</li>
                     <li>• Keep stories authentic and respectful</li>
-                    <li>• Highlight impact on community</li>
-                    <li>• Ensure student consent for sharing</li>
+                    <li>• Use a real image URL for now</li>
+                    <li>• Ensure consent before sharing</li>
                   </ul>
                 </div>
               </div>
             </div>
 
-            {/* Actions */}
             <div className="flex items-center justify-end gap-3 pt-6 border-t border-gray-200">
               <button
                 type="button"

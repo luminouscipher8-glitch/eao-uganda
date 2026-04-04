@@ -1,13 +1,14 @@
 import { Router, Response } from 'express';
-import { body, param, query } from 'express-validator';
+import { body, param } from 'express-validator';
 import { SupabaseAuth } from '../middleware/supabaseAuth.js';
 import { ApiResponse, AuthenticatedRequest } from '../types/index.js';
 import { supabase } from '../lib/supabase.js';
 
 const router = Router();
 
-// Apply admin authentication to all admin routes
-router.use(SupabaseAuth.authenticate);
+// Apply admin authentication and authorization to all admin routes
+router.use(SupabaseAuth.requireAdmin);
+// router.use(SupabaseAuth.requireAdmin);
 
 // Dashboard stats endpoint
 router.get('/dashboard/stats', async (req: AuthenticatedRequest, res: Response) => {
@@ -47,20 +48,6 @@ router.get('/dashboard/stats', async (req: AuthenticatedRequest, res: Response) 
     } as ApiResponse);
   }
 });
-
-// Helper function to format time ago
-function getTimeAgo(dateString: string): string {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMins = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMs / 3600000);
-  const diffDays = Math.floor(diffMs / 86400000);
-
-  if (diffMins < 60) return `${diffMins} minute${diffMins !== 1 ? 's' : ''} ago`;
-  if (diffHours < 24) return `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`;
-  return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`;
-}
 
 // Programs endpoints
 router.get('/programs', async (req: AuthenticatedRequest, res: Response) => {
@@ -194,7 +181,7 @@ router.delete('/programs/:id', [
 });
 
 // Events endpoints
-router.get('/events', SupabaseAuth.optionalAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.get('/events', async (req: AuthenticatedRequest, res: Response) => {
   try {
     console.log('GET /events request received');
     const { data: events, error } = await supabase
@@ -230,7 +217,7 @@ router.post('/events', [
   body('description').notEmpty().withMessage('Description is required'),
   body('event_type').notEmpty().withMessage('Event type is required'),
   body('event_date').notEmpty().withMessage('Event date is required'),
-], SupabaseAuth.optionalAuth, async (req: AuthenticatedRequest, res: Response) => {
+], async (req: AuthenticatedRequest, res: Response) => {
   try {
     console.log('POST /events request received:', req.body);
     const { title, description, event_type, event_date, location, participants, funds_raised, image, is_featured, status } = req.body;
@@ -352,27 +339,25 @@ router.delete('/events/:id', [
 // News endpoints
 router.get('/news', async (req: AuthenticatedRequest, res: Response) => {
   try {
-    // Mock news data - replace with actual database query
-    const news = [
-      {
-        id: '1',
-        title: 'New School Building Completed',
-        content: 'We are excited to announce the completion of our new school building...',
-        excerpt: 'A new milestone in our educational mission',
-        featured_image: '/images/news/school-building.jpg',
-        status: 'published',
-        published_at: '2024-01-20T10:00:00Z',
-        created_at: '2024-01-20T09:00:00Z',
-        updated_at: '2024-01-20T09:00:00Z'
-      }
-    ];
+    const { data: news, error } = await supabase
+      .from('news')
+      .select('*')
+      .order('created_at', { ascending: false });
 
-    res.json({
+    if (error) {
+      console.error('Database error:', error);
+      return res.status(500).json({
+        success: false,
+        error: error.message
+      } as ApiResponse);
+    }
+
+    return res.json({
       success: true,
-      data: news
-    } as ApiResponse<typeof news>);
+      data: news || []
+    } as ApiResponse);
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: error instanceof Error ? error.message : 'Failed to fetch news'
     } as ApiResponse);
@@ -388,53 +373,168 @@ router.post('/news', [
   try {
     const { title, content, excerpt, featured_image, status, published_at } = req.body;
 
-    const newNews = {
-      id: Date.now().toString(),
-      title,
-      content,
-      excerpt,
-      featured_image: featured_image || '/images/news/default.jpg',
-      status,
-      published_at: status === 'published' ? (published_at || new Date().toISOString()) : undefined,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    };
+    const { data: newNews, error } = await supabase
+      .from('news')
+      .insert({
+        title,
+        content,
+        excerpt,
+        featured_image: featured_image || '/images/news/default.jpg',
+        status,
+        published_at: status === 'published' ? (published_at || new Date().toISOString()) : null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
+      .select()
+      .single();
 
-    res.status(201).json({
+    if (error) {
+      console.error('Database error:', error);
+      return res.status(500).json({
+        success: false,
+        error: error.message
+      } as ApiResponse);
+    }
+
+    return res.status(201).json({
       success: true,
       data: newNews
-    } as ApiResponse<typeof newNews>);
+    } as ApiResponse);
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: error instanceof Error ? error.message : 'Failed to create news'
     } as ApiResponse);
   }
 });
 
+// GET individual news item
+router.get('/news/:id', [
+  param('id').notEmpty().withMessage('News ID is required')
+], async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const { data: news, error } = await supabase
+      .from('news')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) {
+      console.error('Database error:', error);
+      return res.status(500).json({
+        success: false,
+        error: error.message
+      } as ApiResponse);
+    }
+
+    return res.json({
+      success: true,
+      data: news
+    } as ApiResponse);
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to fetch news item'
+    } as ApiResponse);
+  }
+});
+
+// PUT update news item
+router.put('/news/:id', [
+  param('id').notEmpty().withMessage('News ID is required'),
+  body('title').optional().notEmpty().withMessage('Title cannot be empty'),
+  body('content').optional().notEmpty().withMessage('Content cannot be empty'),
+], async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const updates = req.body;
+
+    const { data: updatedNews, error } = await supabase
+      .from('news')
+      .update({
+        ...updates,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Database error:', error);
+      return res.status(500).json({
+        success: false,
+        error: error.message
+      } as ApiResponse);
+    }
+
+    return res.json({
+  success: true,
+  data: updatedNews
+} as ApiResponse);
+  } catch (error) {
+    return res.status(500).json({
+  success: false,
+  error: error instanceof Error ? error.message : 'Failed to update news'
+} as ApiResponse);
+  }
+});
+
+// DELETE news item
+router.delete('/news/:id', [
+  param('id').notEmpty().withMessage('News ID is required')
+], async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const { error } = await supabase
+      .from('news')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Database error:', error);
+      return res.status(500).json({
+        success: false,
+        error: error.message
+      } as ApiResponse);
+    }
+
+    return res.json({
+  success: true,
+  data: null
+} as ApiResponse);
+  } catch (error) {
+    return res.status(500).json({
+  success: false,
+  error: error instanceof Error ? error.message : 'Failed to delete news'
+} as ApiResponse);
+  }
+});
+
 // Contacts endpoint
 router.get('/contacts', async (req: AuthenticatedRequest, res: Response) => {
   try {
-    // Mock contacts data - replace with actual database query
-    const contacts = [
-      {
-        id: '1',
-        name: 'John Doe',
-        email: 'john@example.com',
-        phone: '+256123456789',
-        subject: 'Volunteer Inquiry',
-        message: 'I would like to volunteer for your programs...',
-        status: 'new',
-        created_at: '2024-01-25T10:00:00Z'
-      }
-    ];
+    const { data: contacts, error } = await supabase
+      .from('contacts')
+      .select('*')
+      .order('created_at', { ascending: false });
 
-    res.json({
+    if (error) {
+      console.error('Database error:', error);
+      return res.status(500).json({
+        success: false,
+        error: error.message
+      } as ApiResponse);
+    }
+
+    return res.json({
       success: true,
-      data: contacts
-    } as ApiResponse<typeof contacts>);
+      data: contacts || []
+    } as ApiResponse);
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: error instanceof Error ? error.message : 'Failed to fetch contacts'
     } as ApiResponse);
@@ -449,19 +549,30 @@ router.patch('/contacts/:id/status', [
     const { id } = req.params;
     const { status } = req.body;
 
-    // Mock status update - replace with actual database update
-    const updatedContact = {
-      id,
-      status,
-      updated_at: new Date().toISOString()
-    };
+    const { data: updatedContact, error } = await supabase
+      .from('contacts')
+      .update({
+        status,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', id)
+      .select()
+      .single();
 
-    res.json({
+    if (error) {
+      console.error('Database error:', error);
+      return res.status(500).json({
+        success: false,
+        error: error.message
+      } as ApiResponse);
+    }
+
+    return res.json({
       success: true,
       data: updatedContact
-    } as ApiResponse<typeof updatedContact>);
+    } as ApiResponse);
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: error instanceof Error ? error.message : 'Failed to update contact status'
     } as ApiResponse);
@@ -501,9 +612,13 @@ router.post('/school-building', [
   body('title').notEmpty().withMessage('Title is required'),
   body('description').notEmpty().withMessage('Description is required'),
   body('phase').notEmpty().withMessage('Phase is required'),
+  body('progress_percentage').optional().isInt({ min: 0, max: 100 }).withMessage('Progress must be between 0 and 100'),
+  body('target_amount').optional().isFloat({ min: 0 }).withMessage('Target amount must be positive'),
+  body('raised_amount').optional().isFloat({ min: 0 }).withMessage('Raised amount must be positive'),
+  body('currency').optional().isLength({ min: 3, max: 3 }).withMessage('Currency must be 3 characters'),
 ], async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const { title, description, phase, status, start_date, end_date, budget, progress, image } = req.body;
+    const { title, description, phase, status, start_date, end_date, budget, progress_percentage, target_amount, raised_amount, currency, image } = req.body;
 
     // Insert into database
     const { data: newPhase, error } = await supabase
@@ -516,7 +631,10 @@ router.post('/school-building', [
         start_date: start_date || null,
         end_date: end_date || null,
         budget: budget || 0,
-        progress: progress || 0,
+        progress_percentage: progress_percentage || 0,
+        target_amount: target_amount || 0,
+        raised_amount: raised_amount || 0,
+        currency: currency || 'UGX',
         image: image || '/images/school-building/default.jpg',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
@@ -548,15 +666,28 @@ router.post('/school-building', [
 router.put('/school-building/:id', [
   param('id').notEmpty().withMessage('School building ID is required'),
   body('title').optional().notEmpty().withMessage('Title cannot be empty'),
+  body('progress_percentage').optional().isInt({ min: 0, max: 100 }).withMessage('Progress must be between 0 and 100'),
+  body('target_amount').optional().isFloat({ min: 0 }).withMessage('Target amount must be positive'),
+  body('raised_amount').optional().isFloat({ min: 0 }).withMessage('Raised amount must be positive'),
+  body('currency').optional().isLength({ min: 3, max: 3 }).withMessage('Currency must be 3 characters'),
 ], async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { id } = req.params;
     const updates = req.body;
 
+    // Transform field names if needed
+    const transformedUpdates = {
+      ...updates,
+      // Ensure progress_percentage is used instead of progress
+      progress_percentage: updates.progress_percentage !== undefined ? updates.progress_percentage : updates.progress,
+      // Remove progress field if it exists to avoid confusion
+      ...(updates.progress !== undefined && { progress: undefined })
+    };
+
     const { data: updatedPhase, error } = await supabase
       .from('school_building')
       .update({
-        ...updates,
+        ...transformedUpdates,
         updated_at: new Date().toISOString()
       })
       .eq('id', id)
@@ -619,61 +750,92 @@ router.delete('/school-building/:id', [
 // Donations endpoint
 router.get('/donations', async (req: AuthenticatedRequest, res: Response) => {
   try {
-    // Mock donations data - replace with actual database query
-    const donations = [
-      {
-        id: '1',
-        amount: 250000,
-        currency: 'UGX',
-        donor_name: 'Jane Smith',
-        donor_email: 'jane@example.com',
-        donor_phone: '+256123456789',
-        payment_method: 'mobile_money',
-        is_recurring: false,
-        campaign: 'Education Fund',
-        status: 'completed',
-        created_at: '2024-01-25T10:00:00Z'
-      }
-    ];
+    const { data: donations, error } = await supabase
+      .from('donations')
+      .select('*')
+      .order('created_at', { ascending: false });
 
-    res.json({
+    if (error) {
+      console.error('Database error:', error);
+      return res.status(500).json({
+        success: false,
+        error: error.message
+      } as ApiResponse);
+    }
+
+    return res.json({
       success: true,
-      data: donations
-    } as ApiResponse<typeof donations>);
+      data: donations || []
+    } as ApiResponse);
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: error instanceof Error ? error.message : 'Failed to fetch donations'
     } as ApiResponse);
   }
 });
 
+// Donation status update endpoint
+router.patch('/donations/:id/status', [
+  param('id').notEmpty().withMessage('Donation ID is required'),
+  body('status').isIn(['pending', 'completed', 'failed', 'refunded']).withMessage('Invalid status'),
+], async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const { data: updatedDonation, error } = await supabase
+      .from('donations')
+      .update({
+        status,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Database error:', error);
+      return res.status(500).json({
+        success: false,
+        error: error.message
+      } as ApiResponse);
+    }
+
+    return res.json({
+  success: true,
+  data: updatedDonation
+} as ApiResponse);
+  } catch (error) {
+    return res.status(500).json({
+  success: false,
+  error: error instanceof Error ? error.message : 'Failed to update donation status'
+} as ApiResponse);
+  }
+});
+
 // Volunteers endpoint
 router.get('/volunteers', async (req: AuthenticatedRequest, res: Response) => {
   try {
-    // Mock volunteers data - replace with actual database query
-    const volunteers = [
-      {
-        id: '1',
-        name: 'Michael Johnson',
-        email: 'michael@example.com',
-        phone: '+256123456789',
-        age: '28',
-        occupation: 'Teacher',
-        skills: ['Teaching', 'Mentoring', 'Sports'],
-        availability: 'Weekends',
-        motivation: 'I want to help children get better education',
-        status: 'pending',
-        created_at: '2024-01-25T10:00:00Z'
-      }
-    ];
+    const { data: volunteers, error } = await supabase
+      .from('volunteers')
+      .select('*')
+      .order('created_at', { ascending: false });
 
-    res.json({
+    if (error) {
+      console.error('Database error:', error);
+      return res.status(500).json({
+        success: false,
+        error: error.message
+      } as ApiResponse);
+    }
+
+    return res.json({
       success: true,
-      data: volunteers
-    } as ApiResponse<typeof volunteers>);
+      data: volunteers || []
+    } as ApiResponse);
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: error instanceof Error ? error.message : 'Failed to fetch volunteers'
     } as ApiResponse);
@@ -688,21 +850,71 @@ router.patch('/volunteers/:id/status', [
     const { id } = req.params;
     const { status } = req.body;
 
-    // Mock status update - replace with actual database update
-    const updatedVolunteer = {
-      id,
-      status,
-      updated_at: new Date().toISOString()
-    };
+    const { data: updatedVolunteer, error } = await supabase
+      .from('volunteers')
+      .update({
+        status,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', id)
+      .select()
+      .single();
 
-    res.json({
+    if (error) {
+      console.error('Database error:', error);
+      return res.status(500).json({
+        success: false,
+        error: error.message
+      } as ApiResponse);
+    }
+
+    return res.json({
       success: true,
       data: updatedVolunteer
-    } as ApiResponse<typeof updatedVolunteer>);
+    } as ApiResponse);
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: error instanceof Error ? error.message : 'Failed to update volunteer status'
+    } as ApiResponse);
+  }
+});
+
+// Event status update endpoint
+router.patch('/events/:id/status', [
+  param('id').notEmpty().withMessage('Event ID is required'),
+  body('status').isIn(['upcoming', 'ongoing', 'completed', 'cancelled']).withMessage('Invalid status'),
+], async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const { data: updatedEvent, error } = await supabase
+      .from('events')
+      .update({
+        status,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Database error:', error);
+      return res.status(500).json({
+        success: false,
+        error: error.message
+      } as ApiResponse);
+    }
+
+    return res.json({
+      success: true,
+      data: updatedEvent
+    } as ApiResponse);
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to update event status'
     } as ApiResponse);
   }
 });
@@ -725,10 +937,9 @@ router.get('/success-stories', async (req: AuthenticatedRequest, res: Response) 
 
     return res.json({
       success: true,
-      data: stories || []
+      data: stories
     } as ApiResponse);
   } catch (error) {
-    console.error('Fetch success stories error:', error);
     return res.status(500).json({
       success: false,
       error: error instanceof Error ? error.message : 'Failed to fetch success stories'
@@ -853,25 +1064,142 @@ router.delete('/success-stories/:id', [
   }
 });
 
-// File upload endpoint
-router.post('/upload', async (req: AuthenticatedRequest, res: Response) => {
+// Success story status update endpoint
+router.patch('/success-stories/:id/status', [
+  param('id').notEmpty().withMessage('Success story ID is required'),
+  body('status').isIn(['draft', 'published', 'archived']).withMessage('Invalid status'),
+], async (req: AuthenticatedRequest, res: Response) => {
   try {
-    // This is a placeholder for file upload logic
-    // In a real implementation, you'd use multer or similar middleware
-    // and upload to Supabase Storage or your preferred file storage
-    
-    res.json({
-      success: true,
-      data: {
-        url: '/images/uploads/example.jpg'
-      }
-    } as ApiResponse<{ url: string }>);
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const { data: updatedStory, error } = await supabase
+      .from('success_stories')
+      .update({
+        status,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Database error:', error);
+      return res.status(500).json({
+        success: false,
+        error: error.message
+      } as ApiResponse);
+    }
+
+    return res.json({
+  success: true,
+  data: updatedStory
+} as ApiResponse);
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
+  success: false,
+  error: error instanceof Error ? error.message : 'Failed to update success story status'
+} as ApiResponse);
+  }
+});
+
+// Success story featured toggle endpoint
+router.patch('/success-stories/:id/featured', [
+  param('id').notEmpty().withMessage('Success story ID is required'),
+], async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    // First get current story to toggle featured status
+    const { data: currentStory, error: fetchError } = await supabase
+      .from('success_stories')
+      .select('is_featured')
+      .eq('id', id)
+      .single();
+
+    if (fetchError) {
+      console.error('Database error:', fetchError);
+      return res.status(500).json({
+        success: false,
+        error: fetchError.message
+      } as ApiResponse);
+    }
+
+    const { data: updatedStory, error: updateError } = await supabase
+      .from('success_stories')
+      .update({
+        is_featured: !currentStory?.is_featured,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (updateError) {
+      console.error('Database error:', updateError);
+      return res.status(500).json({
+        success: false,
+        error: updateError.message
+      } as ApiResponse);
+    }
+
+    return res.json({
+  success: true,
+  data: updatedStory
+} as ApiResponse);
+  } catch (error) {
+    return res.status(500).json({
+  success: false,
+  error: error instanceof Error ? error.message : 'Failed to toggle success story featured status'
+} as ApiResponse);
+  }
+});
+
+// School Building progress update endpoint
+router.patch('/school-building/:id/progress', [
+  param('id').notEmpty().withMessage('School building ID is required'),
+  body('progress_percentage').isInt({ min: 0, max: 100 }).withMessage('Progress must be between 0 and 100'),
+], async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { progress_percentage } = req.body;
+
+    const { data: updatedPhase, error } = await supabase
+      .from('school_building')
+      .update({
+        progress_percentage,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Database error:', error);
+      return res.status(500).json({
+        success: false,
+        error: error.message
+      } as ApiResponse);
+    }
+
+    return res.json({
+      success: true,
+      data: updatedPhase
+    } as ApiResponse);
+  } catch (error) {
+    return res.status(500).json({
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to upload file'
+      error: error instanceof Error ? error.message : 'Failed to update school building progress'
     } as ApiResponse);
   }
+});
+
+// File upload endpoint
+router.post('/upload', async (_req: AuthenticatedRequest, res: Response) => {
+  res.status(501).json({
+    success: false,
+    error: 'File upload is not implemented yet'
+  } as ApiResponse);
 });
 
 export { router as adminRoutes };

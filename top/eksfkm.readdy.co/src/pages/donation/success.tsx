@@ -61,7 +61,7 @@ export default function DonationSuccessPage() {
           
           toast.success(
             'Thank You for Your Donation!',
-            'Your generous donation has been successfully processed. You will receive a receipt via email.',
+            'Your generous donation has been successfully processed.',
             8000
           );
         } else if (finalStatus.status === 'FAILED') {
@@ -143,7 +143,7 @@ export default function DonationSuccessPage() {
           <div className="space-y-2 text-sm text-gray-500">
             <p>• Verifying payment with Pesapal</p>
             <p>• Updating your donation record</p>
-            <p>• Preparing your receipt</p>
+            <p>• Confirming your payment details</p>
           </div>
         </div>
       </div>
@@ -237,8 +237,11 @@ export default function DonationSuccessPage() {
             {paymentStatus.status === 'COMPLETED' && (
               <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
                 <p className="text-sm text-green-800">
-                  <strong>Receipt Sent:</strong> A detailed receipt has been sent to your email address. 
-                  Please keep it for your records.
+                  <strong>Donation Confirmed:</strong> Your donation has been successfully processed.
+                  Thank you for supporting our mission to educate orphans in Uganda.
+                </p>
+                <p className="text-sm text-green-800 mt-2">
+                  If you need a receipt or donation confirmation, please contact us and share your transaction ID and tracking ID.
                 </p>
               </div>
             )}
@@ -258,7 +261,7 @@ export default function DonationSuccessPage() {
                         </svg>
                       </div>
                       <p className="text-sm text-gray-600">
-                        You'll receive a confirmation email with your donation details within 24 hours.
+                        Keep your transaction and tracking IDs for reference in case you need support.
                       </p>
                     </div>
                     <div className="flex items-start gap-3">
@@ -278,7 +281,7 @@ export default function DonationSuccessPage() {
                         </svg>
                       </div>
                       <p className="text-sm text-gray-600">
-                        We'll send you updates on how your donation is making an impact.
+                        You can follow our programs and updates through the website and our official channels.
                       </p>
                     </div>
                   </div>
