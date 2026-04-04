@@ -14,31 +14,37 @@ A modern, production-ready React-based charity website for Educate an Orphan Uga
 ## 🚀 Tech Stack
 
 ### Frontend Framework
+
 - **React 18** - Latest React with concurrent features
 - **TypeScript 5.2** - Type-safe development
 - **Vite 5.4** - Lightning-fast build tool
 
 ### Styling & UI
+
 - **TailwindCSS 3.3** - Utility-first CSS framework
 - **PostCSS 8.4** - CSS processing
 - **Autoprefixer** - Cross-browser compatibility
 
 ### Routing & State
+
 - **React Router v6** - Modern routing with lazy loading
 - **React Context** - Global state management
 
 ### Internationalization
+
 - **i18next 23.7** - Multi-language support
 - **React-i18next 13.5** - React integration
 - **Browser Language Detection** - Automatic language selection
 
 ### Testing & Quality
+
 - **Vitest 1.0** - Modern testing framework
 - **React Testing Library 14.1** - Component testing
 - **ESLint 8.55** - Code quality
 - **Prettier 3.1** - Code formatting
 
 ### PWA & Performance
+
 - **Vite PWA Plugin 0.17** - Progressive Web App
 - **Service Worker** - Offline functionality
 - **Image Optimization** - WebP support & lazy loading
@@ -46,27 +52,32 @@ A modern, production-ready React-based charity website for Educate an Orphan Uga
 ## 📦 Installation
 
 ### Prerequisites
-- Node.js 18+ 
+
+- Node.js 18+
 - npm or yarn
 
 ### Setup
+
 1. Clone the repository:
+
 ```bash
 git clone <repository-url>
 cd eksfkm-readdy-co
 ```
 
-2. Install dependencies:
+1. Install dependencies:
+
 ```bash
 npm install
 ```
 
-3. Start development server:
+1. Start development server:
+
 ```bash
 npm run dev
 ```
 
-4. Open your browser and navigate to `http://localhost:5173`
+1. Open your browser and navigate to `http://localhost:5173`
 
 ## 🛠️ Available Scripts
 
@@ -94,7 +105,7 @@ npm run test:run      # Run tests once
 
 ## 📁 Project Structure
 
-```
+```bash
 eksfkm-readdy-co/
 ├── 📁 src/                          # Source code
 │   ├── 📁 components/                   # Reusable UI components
@@ -143,6 +154,7 @@ eksfkm-readdy-co/
 ## 🎯 Features
 
 ### ♿ Accessibility
+
 - **WCAG AA Compliant** - Full accessibility support
 - **Keyboard Navigation** - Complete keyboard accessibility
 - **Screen Reader Support** - Semantic HTML & ARIA labels
@@ -151,6 +163,7 @@ eksfkm-readdy-co/
 - **Color Contrast** - WCAG AA compliant colors
 
 ### 🎨 User Experience
+
 - **Micro-interactions** - Hover, bounce, slide, fade animations
 - **Skeleton Loaders** - Loading states for better perceived performance
 - **Form Validation** - Real-time form feedback
@@ -159,6 +172,7 @@ eksfkm-readdy-co/
 - **Smooth Scrolling** - Enhanced navigation experience
 
 ### 📱 Progressive Web App
+
 - **Service Worker** - Offline functionality
 - **Web App Manifest** - Installable web app
 - **Responsive Design** - Mobile-first approach
@@ -166,12 +180,14 @@ eksfkm-readdy-co/
 - **Background Sync** - Background synchronization
 
 ### 🌍 Internationalization
+
 - **Multi-language Support** - i18next integration
 - **Browser Language Detection** - Automatic language selection
 - **Translation Management** - Easy translation workflow
 - **RTL Support** - Right-to-left language support
 
 ### ⚡ Performance
+
 - **Code Splitting** - Lazy loading for optimal performance
 - **Image Optimization** - WebP support & lazy loading
 - **Bundle Optimization** - Optimized at 628.20 KiB (gzipped)
@@ -181,6 +197,7 @@ eksfkm-readdy-co/
 ## 🧪 Testing
 
 ### Test Coverage
+
 - **85.1% Test Coverage** (74/87 tests passing)
 - **Component Testing** - All UI components tested
 - **Hook Testing** - Custom hooks thoroughly tested
@@ -188,6 +205,7 @@ eksfkm-readdy-co/
 - **Error Boundary Testing** - Error handling verified
 
 ### Test Categories
+
 - **Unit Tests** - Individual component testing
 - **Integration Tests** - Component interaction testing
 - **Accessibility Tests** - WCAG compliance testing
@@ -196,11 +214,13 @@ eksfkm-readdy-co/
 ## 🚀 Deployment
 
 ### Build Process
+
 ```bash
 npm run build
 ```
 
 ### Production Features
+
 - **Optimized Bundle** - Minified and compressed assets
 - **Service Worker** - Offline functionality
 - **PWA Manifest** - Installable web app
@@ -208,7 +228,9 @@ npm run build
 - **Secure Headers** - Security headers configured
 
 ### Environment Variables
+
 Create a `.env.production` file:
+
 ```env
 VITE_APP_TITLE=Educate an Orphan Uganda
 VITE_APP_DESCRIPTION=Providing educational support to orphaned children in Uganda
@@ -218,6 +240,7 @@ VITE_APP_URL=https://your-domain.com
 ## 🔧 Configuration
 
 ### TailwindCSS Configuration
+
 ```javascript
 // tailwind.config.js
 module.exports = {
@@ -241,6 +264,7 @@ module.exports = {
 ```
 
 ### Vite Configuration
+
 ```javascript
 // vite.config.ts
 import { defineConfig } from 'vite'
@@ -264,12 +288,14 @@ export default defineConfig({
 ## 📊 Performance Metrics
 
 ### Core Web Vitals
+
 - **First Contentful Paint**: < 1.8s
 - **Largest Contentful Paint**: < 2.5s
 - **Cumulative Layout Shift**: < 0.1
 - **First Input Delay**: < 100ms
 
 ### Bundle Analysis
+
 - **Total Bundle Size**: 628.20 KiB (gzipped)
 - **Main Bundle**: 24.95 kB
 - **Vendor Bundle**: 153.50 kB
@@ -286,6 +312,7 @@ export default defineConfig({
 ## 🤝 Contributing
 
 ### Development Workflow
+
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
@@ -294,6 +321,7 @@ export default defineConfig({
 6. Submit a pull request
 
 ### Code Style
+
 - **ESLint** - Follow configured rules
 - **Prettier** - Automatic formatting
 - **TypeScript** - Strict type checking
@@ -304,6 +332,7 @@ export default defineConfig({
 ### Components
 
 #### AccessibleButton
+
 ```tsx
 <AccessibleButton
   variant="primary"
@@ -317,6 +346,7 @@ export default defineConfig({
 ```
 
 #### OptimizedImage
+
 ```tsx
 <OptimizedImage
   src="image.jpg"
@@ -329,6 +359,7 @@ export default defineConfig({
 ```
 
 #### FormValidation
+
 ```tsx
 const { errors, validateForm, handleFieldChange } = useFormValidation({
   email: validationRules.email,
@@ -339,6 +370,7 @@ const { errors, validateForm, handleFieldChange } = useFormValidation({
 ### Hooks
 
 #### useKeyboardNavigation
+
 ```tsx
 const { trapFocus, restoreFocus } = useKeyboardNavigation(ref, {
   onEscape: handleEscape,
@@ -347,6 +379,7 @@ const { trapFocus, restoreFocus } = useKeyboardNavigation(ref, {
 ```
 
 #### useImageOptimization
+
 ```tsx
 const { preloadImage, generateSrcset } = useImageOptimization();
 ```
@@ -368,7 +401,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - **Issues**: [GitHub Issues](https://github.com/your-repo/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/your-repo/discussions)
-- **Email**: support@educateanorphanuganda.org
+
+- **Email**
+
+```bash
+support@educateanorphanuganda.org
+```
 
 ## 🙏 Acknowledgments
 
@@ -380,6 +418,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📈 Roadmap
 
 ### Phase 1 ✅ (Completed)
+
 - [x] Core functionality
 - [x] Accessibility compliance
 - [x] PWA implementation
@@ -387,12 +426,14 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [x] Testing suite
 
 ### Phase 2 🔄 (In Progress)
+
 - [ ] Additional language translations
 - [ ] Advanced analytics integration
 - [ ] Social sharing features
 - [ ] Enhanced SEO optimization
 
 ### Phase 3 📋 (Planned)
+
 - [ ] Real-time notifications
 - [ ] Advanced animations
 - [ ] Community features
@@ -410,18 +451,21 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 Ready to get started? Follow these simple steps:
 
 1. **Clone & Install**
+
 ```bash
 git clone <repository-url>
 cd eksfkm-readdy-co
 npm install
 ```
 
-2. **Start Development**
+1. **Start Development**
+
 ```bash
 npm run dev
 ```
 
-3. **Build for Production**
+1. **Build for Production**
+
 ```bash
 npm run build
 npm run preview

@@ -142,6 +142,7 @@ export default function ContactPage() {
                         href="https://facebook.com"
                         target="_blank"
                         rel="noopener noreferrer"
+  aria-label="Visit our Facebook page"
                         className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white hover:text-teal-700 transition-all text-white group"
                       >
                         <i className="ri-facebook-fill text-lg group-hover:scale-110 transition-transform"></i>
@@ -150,6 +151,7 @@ export default function ContactPage() {
                         href="https://twitter.com"
                         target="_blank"
                         rel="noopener noreferrer"
+  aria-label="Visit our Twitter page"
                         className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white hover:text-teal-700 transition-all text-white group"
                       >
                         <i className="ri-twitter-fill text-lg group-hover:scale-110 transition-transform"></i>
@@ -158,6 +160,7 @@ export default function ContactPage() {
                         href="https://instagram.com"
                         target="_blank"
                         rel="noopener noreferrer"
+  aria-label="Visit our Instagram page"
                         className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white hover:text-teal-700 transition-all text-white group"
                       >
                         <i className="ri-instagram-fill text-lg group-hover:scale-110 transition-transform"></i>
@@ -166,6 +169,7 @@ export default function ContactPage() {
                         href="https://linkedin.com"
                         target="_blank"
                         rel="noopener noreferrer"
+  aria-label="Visit our Linkedin page"
                         className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white hover:text-teal-700 transition-all text-white group"
                       >
                         <i className="ri-linkedin-fill text-lg group-hover:scale-110 transition-transform"></i>
@@ -213,16 +217,15 @@ export default function ContactPage() {
                   </h3>
                 </div>
                 <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d127641.84796179655!2d32.52219!3d0.31628!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x177dbb8679c6f7e9%3A0x5b8f3c4c8c8c8c8c!2sKampala%2C%20Uganda!5e0!3m2!1sen!2sus!4v1234567890"
-                  width="100%"
-                  height="350"
-                  style={{ border: 0 }}
-                  allowFullScreen
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  title="Office Location"
-                  className="sm:h-[400px]"
-                ></iframe>
+  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d127641.84796179655!2d32.52219!3d0.31628!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x177dbb8679c6f7e9%3A0x5b8f3c4c8c8c8c8c!2sKampala%2C%20Uganda!5e0!3m2!1sen!2sus!4v1234567890"
+  width="100%"
+  height="350"
+  allowFullScreen
+  loading="lazy"
+  referrerPolicy="no-referrer-when-downgrade"
+  title="Office Location"
+  className="w-full border-0 sm:h-[400px]"
+></iframe>
               </div>
             </div>
           </div>

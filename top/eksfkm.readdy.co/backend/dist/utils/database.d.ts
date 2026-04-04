@@ -125,12 +125,15 @@ export declare const db: {
         status: import(".prisma/client").$Enums.DonationStatus;
         amount: number;
         currency: string;
-        flutterwaveTxRef: string;
+        flutterwaveTxRef: string | null;
         flutterwaveTransactionId: string | null;
-        isAnonymous: boolean;
-        donorName: string | null;
-        donorEmail: string | null;
-        paymentMethod: string | null;
+        is_anonymous: boolean;
+        donor_name: string | null;
+        donor_email: string | null;
+        donor_phone: string | null;
+        payment_method: string | null;
+        is_recurring: boolean;
+        payment_id: string | null;
         campaignId: string | null;
     }>;
     updateDonation(id: string, data: any): Promise<{
@@ -147,12 +150,15 @@ export declare const db: {
         status: import(".prisma/client").$Enums.DonationStatus;
         amount: number;
         currency: string;
-        flutterwaveTxRef: string;
+        flutterwaveTxRef: string | null;
         flutterwaveTransactionId: string | null;
-        isAnonymous: boolean;
-        donorName: string | null;
-        donorEmail: string | null;
-        paymentMethod: string | null;
+        is_anonymous: boolean;
+        donor_name: string | null;
+        donor_email: string | null;
+        donor_phone: string | null;
+        payment_method: string | null;
+        is_recurring: boolean;
+        payment_id: string | null;
         campaignId: string | null;
     }>;
     getDonations(params: {
@@ -174,12 +180,15 @@ export declare const db: {
             status: import(".prisma/client").$Enums.DonationStatus;
             amount: number;
             currency: string;
-            flutterwaveTxRef: string;
+            flutterwaveTxRef: string | null;
             flutterwaveTransactionId: string | null;
-            isAnonymous: boolean;
-            donorName: string | null;
-            donorEmail: string | null;
-            paymentMethod: string | null;
+            is_anonymous: boolean;
+            donor_name: string | null;
+            donor_email: string | null;
+            donor_phone: string | null;
+            payment_method: string | null;
+            is_recurring: boolean;
+            payment_id: string | null;
             campaignId: string | null;
         })[];
         total: number;
@@ -232,10 +241,10 @@ export declare const db: {
     }>;
     subscribeToNewsletter(data: any): Promise<{
         id: string;
-        isActive: boolean;
         createdAt: Date;
         updatedAt: Date;
         email: string;
+        is_active: boolean;
         source: string | null;
     }>;
     getNewsletterSubscriptions(params: {
@@ -244,10 +253,10 @@ export declare const db: {
     }): Promise<{
         subscriptions: {
             id: string;
-            isActive: boolean;
             createdAt: Date;
             updatedAt: Date;
             email: string;
+            is_active: boolean;
             source: string | null;
         }[];
         total: number;
@@ -303,12 +312,15 @@ export declare const db: {
             status: import(".prisma/client").$Enums.DonationStatus;
             amount: number;
             currency: string;
-            flutterwaveTxRef: string;
+            flutterwaveTxRef: string | null;
             flutterwaveTransactionId: string | null;
-            isAnonymous: boolean;
-            donorName: string | null;
-            donorEmail: string | null;
-            paymentMethod: string | null;
+            is_anonymous: boolean;
+            donor_name: string | null;
+            donor_email: string | null;
+            donor_phone: string | null;
+            payment_method: string | null;
+            is_recurring: boolean;
+            payment_id: string | null;
             campaignId: string | null;
         }[];
     } & {

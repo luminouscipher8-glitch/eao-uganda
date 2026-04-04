@@ -109,7 +109,8 @@ export class UserController {
             throw new AppError('User not authenticated', 401);
         }
         // Users can only delete their own account unless they're admin
-        if (currentUserId !== targetUserId && req.user?.role !== 'admin') {
+        const isAdmin = req.user?.role === 'admin';
+        if (currentUserId !== targetUserId && !isAdmin) {
             throw new AppError('Insufficient permissions', 403);
         }
         // Delete user profile (Supabase handles auth user deletion)

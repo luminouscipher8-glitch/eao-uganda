@@ -13,7 +13,7 @@ export declare class DonationController {
      */
     getDonation: (req: Request, res: Response, next: import("express").NextFunction) => void;
     /**
-     * Get all donations (admin or user's own donations)
+     * Get all donations
      */
     getDonations: (req: Request, res: Response, next: import("express").NextFunction) => void;
     /**

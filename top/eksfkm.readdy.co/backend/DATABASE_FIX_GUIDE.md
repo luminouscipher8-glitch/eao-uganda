@@ -3,7 +3,7 @@
 ## Current Issue
 The database connection is failing with DNS resolution error:
 ```
-ENOTFOUND db.rogxpucnkqwbeohpkolj.supabase.co
+ENOTFOUND db.https://merrqcqxvqvwfuohlxbs.supabase.co
 ```
 
 ## Steps to Fix:
@@ -22,7 +22,7 @@ ENOTFOUND db.rogxpucnkqwbeohpkolj.supabase.co
 Replace the current DATABASE_URL in `backend/.env`:
 ```bash
 # OLD (broken)
-DATABASE_URL="postgresql://luminouscipher8-glitch:7WpezfT3rWLHuVBN@db.rogxpucnkqwbeohpkolj.supabase.co:5432/postgres"
+DATABASE_URL="postgresql://luminouscipher8-glitch:7WpezfT3rWLHuVBN@db.https://merrqcqxvqvwfuohlxbs.supabase.co:5432/postgres"
 
 # NEW (get from Supabase dashboard)
 DATABASE_URL="postgresql://[user]:[password]@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres"

@@ -15,7 +15,7 @@ async function apiRequest<T = any>(
 ): Promise<ApiResponse<T>> {
   try {
     const url = `${API_BASE_URL}${endpoint}`;
-    
+
     const response = await fetch(url, {
       headers: {
         'Content-Type': 'application/json',
@@ -27,7 +27,7 @@ async function apiRequest<T = any>(
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || `HTTP error! status: ${response.status}`);
+      throw new Error(data.error || data.message || `HTTP error! status: ${response.status}`);
     }
 
     return data;
@@ -46,7 +46,9 @@ export interface ContactFormData {
   message: string;
 }
 
-export const submitContactForm = async (formData: ContactFormData): Promise<ApiResponse> => {
+export const submitContactForm = async (
+  formData: ContactFormData
+): Promise<ApiResponse> => {
   return apiRequest('/api/contact', {
     method: 'POST',
     body: JSON.stringify(formData),
@@ -55,18 +57,20 @@ export const submitContactForm = async (formData: ContactFormData): Promise<ApiR
 
 // Donation form submission
 export interface DonationFormData {
-  amount: string;
-  currency: string;
-  donorName: string;
-  donorEmail: string;
+  amount: number;
+  currency?: string;
+  donorName?: string;
+  donorEmail?: string;
   donorPhone?: string;
-  paymentMethod: string;
-  isRecurring: boolean;
+  message?: string;
+  isRecurring?: boolean;
   campaign?: string;
 }
 
-export const submitDonation = async (formData: DonationFormData): Promise<ApiResponse> => {
-  return apiRequest('/api/donations', {
+export const submitDonation = async (
+  formData: DonationFormData
+): Promise<ApiResponse> => {
+  return apiRequest('/api/payments/donations/create', {
     method: 'POST',
     body: JSON.stringify(formData),
   });
@@ -77,14 +81,16 @@ export interface VolunteerFormData {
   name: string;
   email: string;
   phone: string;
-  age: string;
-  occupation: string;
+  age?: string;
+  occupation?: string;
   skills: string[];
   availability: string;
   motivation: string;
 }
 
-export const submitVolunteerForm = async (formData: VolunteerFormData): Promise<ApiResponse> => {
+export const submitVolunteerForm = async (
+  formData: VolunteerFormData
+): Promise<ApiResponse> => {
   return apiRequest('/api/volunteers', {
     method: 'POST',
     body: JSON.stringify(formData),
@@ -97,7 +103,9 @@ export interface NewsletterData {
   name?: string;
 }
 
-export const subscribeNewsletter = async (data: NewsletterData): Promise<ApiResponse> => {
+export const subscribeNewsletter = async (
+  data: NewsletterData
+): Promise<ApiResponse> => {
   return apiRequest('/api/newsletter', {
     method: 'POST',
     body: JSON.stringify(data),
@@ -136,7 +144,7 @@ export const getEvents = async (): Promise<ApiResponse<Event[]>> => {
 
 // Get success stories
 export interface SuccessStory {
-  id: number;
+  id: string;
   name: string;
   age: string;
   story: string;

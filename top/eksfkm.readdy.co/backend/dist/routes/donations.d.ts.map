@@ -1,1 +1,1 @@
-{"version":3,"file":"donations.d.ts","sourceRoot":"","sources":["../../src/routes/donations.ts"],"names":[],"mappings":"AAMA,QAAA,MAAM,MAAM,4CAAW,CAAC;AAkJxB,OAAO,EAAE,MAAM,IAAI,cAAc,EAAE,CAAC"}
+{"version":3,"file":"donations.d.ts","sourceRoot":"","sources":["../../src/routes/donations.ts"],"names":[],"mappings":"AAKA,QAAA,MAAM,MAAM,4CAAW,CAAC;AAoJxB,OAAO,EAAE,MAAM,IAAI,cAAc,EAAE,CAAC"}

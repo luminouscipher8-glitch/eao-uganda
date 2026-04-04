@@ -44,28 +44,20 @@ async function apiRequest<T = any>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
-  try {
-    const url = `${API_BASE_URL}${endpoint}`;
-    
-    const response = await fetch(url, {
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
-      ...options,
-    });
+  const res = await fetch(`${API_BASE_URL}${endpoint}`, options);
 
-    const data = await response.json();
+  const text = await res.text();
+  let data: any = text;
+  try { data = JSON.parse(text); } catch {}
 
-    if (!response.ok) {
-      throw new Error(data.message || `HTTP error! status: ${response.status}`);
-    }
-
-    return data;
-  } catch (error) {
-    console.error('API request failed:', error);
-    throw error;
+  if (!res.ok) {
+    const e: any = new Error(data?.message || `HTTP error! status: ${res.status}`);
+    e.status = res.status;
+    e.responseBody = data;
+    throw e;
   }
+
+  return data as T;
 }
 
 // Create donation payment
@@ -74,6 +66,9 @@ export const createDonationPayment = async (
 ): Promise<{ success: boolean; data: PesapalPaymentResponse }> => {
   return apiRequest('/api/payments/donations/create', {
     method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
     body: JSON.stringify(paymentData),
   });
 };
@@ -84,6 +79,9 @@ export const createShopPayment = async (
 ): Promise<{ success: boolean; data: PesapalPaymentResponse }> => {
   return apiRequest('/api/payments/shop/create', {
     method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
     body: JSON.stringify(paymentData),
   });
 };

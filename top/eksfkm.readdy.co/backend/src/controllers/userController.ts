@@ -132,9 +132,11 @@ export class UserController {
     }
 
     // Users can only delete their own account unless they're admin
-    if (currentUserId !== targetUserId && req.user?.role !== 'admin') {
-      throw new AppError('Insufficient permissions', 403);
-    }
+    const isAdmin = req.user?.role === 'admin';
+
+if (currentUserId !== targetUserId && !isAdmin) {
+  throw new AppError('Insufficient permissions', 403);
+}
 
     // Delete user profile (Supabase handles auth user deletion)
     await (db.prisma as any).userProfile.delete({

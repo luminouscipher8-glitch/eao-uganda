@@ -1,48 +1,76 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  'https://rogxpucnkqwbeohpkolj.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJvZ3hwdWNua3F3YmVvaHBrb2xqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkyNzQwOTQsImV4cCI6MjA4NDg1MDA5NH0.TljQitsZXswDQTspvytNJrkz4eOEPWwX-ur2zOs9Ir4'
+// ✅ ENV variables (use dotenv in your real project)
+const SUPABASE_URL = process.env.SUPABASE_URL!;
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY!;
+
+// ✅ Clients
+const supabaseAdmin: SupabaseClient = createClient(
+  SUPABASE_URL,
+  SUPABASE_SERVICE_ROLE_KEY,
+  { auth: { persistSession: false, autoRefreshToken: false } }
+);
+
+const supabaseAuth: SupabaseClient = createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY
 );
 
 async function fixAdminRole() {
   try {
     console.log('🔧 Fixing admin role for admin@eao.ug...');
-    
-    // First sign in as the user
-    const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-      email: 'admin@eao.ug',
-      password: 'Admin123456!'
-    });
 
-    if (signInError) {
-      console.error('❌ Sign in error:', signInError);
+    // ✅ Find the admin user via service role client
+    const { data: usersData, error: listError } = await (supabaseAdmin.auth as any).admin.listUsers();
+
+    if (listError) throw listError;
+
+    const adminUser = usersData?.users?.find((u: any) => u.email === 'admin@eao.ug');
+
+    if (!adminUser) {
+      console.error('❌ Admin user not found');
       return;
     }
 
-    console.log('✅ Signed in successfully');
+    console.log('✅ Admin user found:', adminUser.email);
 
-    // Update user metadata to set admin role
-    const { data: updateData, error: updateError } = await supabase.auth.updateUser({
-      data: {
+    // ✅ Update metadata securely via service-role client
+    const { data: updateData, error: updateError } = await (supabaseAdmin.auth as any).admin.updateUserById(adminUser.id, {
+      user_metadata: {
+        ...adminUser.user_metadata,
         role: 'admin',
-        name: 'EAO Admin'
-      }
+        name: 'EAO Admin',
+      },
     });
 
     if (updateError) {
-      console.error('❌ Update error:', updateError);
-    } else {
-      console.log('✅ Admin role set successfully!');
-      console.log('Updated user:', updateData);
+      console.error('❌ Failed to update admin role:', updateError.message);
+      return;
     }
 
-    // Sign out
-    await supabase.auth.signOut();
-    console.log('🔐 Signed out');
+    console.log('✅ Admin role updated successfully!');
+    console.log('Updated user:', updateData);
 
-  } catch (error) {
-    console.error('❌ Error:', error);
+    // Optional: Test login as user (via anon client)
+    const { data: signInData, error: signInError } = await (supabaseAuth.auth as any).signInWithPassword({
+      email: 'admin@eao.ug',
+      password: 'Admin123456!',
+    });
+
+    if (signInError) {
+      console.warn('⚠️ Could not sign in as admin for testing:', signInError.message);
+    } else {
+      console.log('✅ Admin login test successful:', signInData.user?.email);
+
+      // Sign out
+      await (supabaseAuth.auth as any).signOut();
+      console.log('🔐 Signed out after test');
+    }
+
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    console.error('❌ Error:', message);
   }
 }
 

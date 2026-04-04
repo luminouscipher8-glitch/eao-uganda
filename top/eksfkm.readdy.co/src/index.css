@@ -140,8 +140,8 @@
       rgb(13 148 136),
       rgb(245 158 11)
     );
-    background-clip: text;
     -webkit-background-clip: text;
+    background-clip: text;
     color: transparent;
   }
 }

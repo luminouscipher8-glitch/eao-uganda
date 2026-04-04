@@ -1,6 +1,4 @@
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { supabase } from '../lib/supabase.js';
 
 export interface CreatePaymentData {
   type: 'DONATION' | 'SHOP';
@@ -17,15 +15,15 @@ export interface CreatePaymentData {
 
 export interface CreateDonationData {
   payment_id?: string;
-  donor_name?: string;
-  donor_email?: string;
-  donor_phone?: string;
   message?: string;
   amount?: number;
   currency?: string;
   flutterwaveTxRef?: string;
   userId?: string;
   campaignId?: string;
+  is_anonymous?: boolean;
+  payment_method?: string;
+  is_recurring?: boolean;
 }
 
 export interface CreateOrderData {
@@ -43,8 +41,9 @@ export class DatabaseService {
    * Create a payment record
    */
   async createPayment(data: CreatePaymentData) {
-    return await (prisma as any).payment.create({
-      data: {
+    const result = await supabase
+      .from('payments')
+      .insert({
         type: data.type,
         merchant_reference: data.merchant_reference,
         amount: data.amount,
@@ -55,60 +54,83 @@ export class DatabaseService {
         tracking_id: data.tracking_id,
         pesapal_status: data.pesapal_status,
         payment_method: data.payment_method,
-      },
-    });
+        created_at: new Date().toISOString()
+      })
+      .select()
+      .single();
+
+    if (result.error) {
+      throw new Error(result.error.message);
+    }
+
+    return result.data;
   }
 
   /**
    * Update a payment record
    */
   async updatePayment(id: string, data: Partial<CreatePaymentData>) {
-    return await (prisma as any).payment.update({
-      where: { id },
-      data: {
-        ...(data.tracking_id && { tracking_id: data.tracking_id }),
-        ...(data.status && { status: data.status }),
-        ...(data.pesapal_status && { pesapal_status: data.pesapal_status }),
-        ...(data.payment_method && { payment_method: data.payment_method }),
-      },
-    });
+    const result = await supabase
+      .from('payments')
+      .update({
+        ...data,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (result.error) {
+      throw new Error(result.error.message);
+    }
+
+    return result.data;
   }
 
   /**
    * Get payment by tracking ID
    */
   async getPaymentByTrackingId(trackingId: string) {
-    return await (prisma as any).payment.findUnique({
-      where: { tracking_id: trackingId },
-    });
+    const result = await supabase
+      .from('payments')
+      .select('*')
+      .eq('tracking_id', trackingId)
+      .single();
+
+    if (result.error) {
+      throw new Error(result.error.message);
+    }
+
+    return result.data;
   }
 
   /**
    * Create a donation record
    */
   async createDonation(data: CreateDonationData) {
-    return await (prisma as any).donation.create({
-      data: {
-        payment_id: data.payment_id,
-        donorName: data.donor_name,
-        donorEmail: data.donor_email,
-        donorPhone: data.donor_phone,
-        message: data.message,
-        amount: data.amount || 0,
-        currency: data.currency || 'UGX',
-        flutterwaveTxRef: data.flutterwaveTxRef,
-        userId: data.userId,
-        campaignId: data.campaignId,
-      },
-    });
+    const result = await supabase
+      .from('donations')
+      .insert({
+        ...data,
+        created_at: new Date().toISOString()
+      })
+      .select()
+      .single();
+
+    if (result.error) {
+      throw new Error(result.error.message);
+    }
+
+    return result.data;
   }
 
   /**
    * Create an order record
    */
   async createOrder(data: CreateOrderData) {
-    return await (prisma as any).order.create({
-      data: {
+    const result = await supabase
+      .from('orders')
+      .insert({
         payment_id: data.payment_id,
         status: data.status,
         total_amount: data.total_amount,
@@ -116,91 +138,122 @@ export class DatabaseService {
         customer_info: data.customer_info,
         shipping_info: data.shipping_info,
         order_items: data.order_items,
-      },
-    });
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
+      .select()
+      .single();
+
+    if (result.error) {
+      throw new Error(result.error.message);
+    }
+
+    return result.data;
   }
 
   /**
    * Update order by payment ID
    */
   async updateOrderByPaymentId(paymentId: string, data: Partial<CreateOrderData>) {
-    return await (prisma as any).order.updateMany({
-      where: { payment_id: paymentId },
-      data: {
-        ...(data.status && { status: data.status }),
-      },
-    });
+    const result = await supabase
+      .from('orders')
+      .update({
+        ...data,
+        updated_at: new Date().toISOString()
+      })
+      .eq('payment_id', paymentId)
+      .select()
+      .single();
+
+    if (result.error) {
+      throw new Error(result.error.message);
+    }
+
+    return result.data;
   }
 
   /**
-   * Get donations with filters
+   * Get donations with pagination and filtering
    */
   async getDonations(filters: {
     page?: number;
     limit?: number;
-    userId?: string;
-  }) {
+    status?: string;
+    startDate?: string;
+    endDate?: string;
+  } = {}) {
+    let query = supabase
+      .from('donations')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    // Apply filters
+    if (filters.status) {
+      query = query.eq('status', filters.status);
+    }
+
+    if (filters.startDate) {
+      query = query.gte('created_at', filters.startDate);
+    }
+
+    if (filters.endDate) {
+      query = query.lte('created_at', filters.endDate);
+    }
+
+    // Apply pagination
     const page = filters.page || 1;
     const limit = filters.limit || 10;
-    const skip = (page - 1) * limit;
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
 
-    const where = {
-      ...(filters.userId && { userId: filters.userId }),
-    };
+    query = query.range(from, to);
 
-    const [donations, total] = await Promise.all([
-      (prisma as any).donation.findMany({
-        where,
-        include: {
-          payment: true,
-        },
-        skip,
-        take: limit,
-        orderBy: { createdAt: 'desc' },
-      }),
-      (prisma as any).donation.count({ where }),
-    ]);
+    const result = await query;
+
+    if (result.error) {
+      throw new Error(result.error.message);
+    }
 
     return {
-      donations,
-      total,
+      data: result.data || [],
+      count: result.count || 0,
       page,
-      limit,
-      pages: Math.ceil(total / limit),
-      hasNext: page * limit < total,
-      hasPrev: page > 1,
+      limit
     };
   }
 
   /**
-   * Get campaign donations
+   * Get donations for a specific campaign
    */
-  async getCampaignDonations(campaignId?: string, page = 1, limit = 10) {
-    const skip = (page - 1) * limit;
+  async getCampaignDonations(campaignId: string, filters: {
+    page?: number;
+    limit?: number;
+  } = {}) {
+    let query = supabase
+      .from('donations')
+      .select('*')
+      .eq('campaignId', campaignId)
+      .order('created_at', { ascending: false });
 
-    const where = campaignId ? { campaignId: campaignId } : {};
+    // Apply pagination
+    const page = filters.page || 1;
+    const limit = filters.limit || 10;
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
 
-    const [donations, total] = await Promise.all([
-      (prisma as any).donation.findMany({
-        where,
-        include: {
-          payment: true,
-        },
-        skip,
-        take: limit,
-        orderBy: { createdAt: 'desc' },
-      }),
-      (prisma as any).donation.count({ where }),
-    ]);
+    query = query.range(from, to);
+
+    const result = await query;
+
+    if (result.error) {
+      throw new Error(result.error.message);
+    }
 
     return {
-      donations,
-      total,
+      data: result.data || [],
+      count: result.count || 0,
       page,
-      limit,
-      pages: Math.ceil(total / limit),
-      hasNext: page * limit < total,
-      hasPrev: page > 1,
+      limit
     };
   }
 }

@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import axios from 'axios';
+import axios, { AxiosError } from "axios";
 
 export interface PesapalPaymentRequest {
   amount: number;
@@ -38,17 +38,21 @@ export interface PesapalTransactionStatus {
 
 class PesapalService {
   private baseUrl: string;
+  private accessToken: string | null = null;
+  private tokenExpiry: number | null = null;
   private consumerKey: string;
   private consumerSecret: string;
-  private accessToken: string | null = null;
-  private tokenExpiry: number = 0;
 
   constructor() {
-    this.baseUrl = process.env.PESAPAL_ENV === 'production' 
-      ? 'https://pay.pesapal.com/v3' 
-      : 'https://cybqa.pesapal.com/v3';
-    this.consumerKey = process.env.PESAPAL_CONSUMER_KEY!;
-    this.consumerSecret = process.env.PESAPAL_CONSUMER_SECRET!;
+    const env = process.env.PESAPAL_ENV ?? "sandbox";
+    this.baseUrl = env === "production" ? "https://pay.pesapal.com/v3" : "https://cybqa.pesapal.com/v3";
+
+    if (!process.env.PESAPAL_CONSUMER_KEY || !process.env.PESAPAL_CONSUMER_SECRET) {
+      throw new Error("Missing Pesapal env vars: PESAPAL_CONSUMER_KEY and/or PESAPAL_CONSUMER_SECRET");
+    }
+
+    this.consumerKey = process.env.PESAPAL_CONSUMER_KEY;
+    this.consumerSecret = process.env.PESAPAL_CONSUMER_SECRET;
   }
 
   /**
@@ -60,7 +64,7 @@ class PesapalService {
       return this.accessToken;
     }
 
-    const credentials = Buffer.from(`${process.env.PESAPAL_CONSUMER_KEY}:${process.env.PESAPAL_CONSUMER_SECRET}`).toString('base64');
+    const credentials = Buffer.from(`${this.consumerKey}:${this.consumerSecret}`).toString('base64');
     
     const response = await axios.post(`${this.baseUrl}/api/Auth/RequestToken`, {}, {
       headers: {
@@ -97,24 +101,37 @@ class PesapalService {
           description: paymentData.description,
           callback_url: paymentData.callback_url,
           redirect_url: paymentData.redirect_url,
-          notification_mode: 'CALLBACK',
-          brand_name: 'Educate an Orphan Uganda',
-          logo: 'https://your-domain.com/logo.png',
-          language: 'en',
-          payment_methods: ['mobilemoney', 'card', 'banktransfer'],
+
+          // Start minimal; add optional fields after it works:
+          notification_mode: "CALLBACK",
+          brand_name: "Educate an Orphan Uganda",
+          language: "en",
+          // Remove logo/payment_methods for now (often causes validation issues)
         },
         {
           headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
         }
       );
 
       return response.data;
     } catch (error) {
-      console.error('Failed to submit payment to Pesapal:', error);
-      throw new Error('Failed to create payment with Pesapal');
+      const err = error as AxiosError<any>;
+
+      console.error("Pesapal SubmitOrderRequest failed:", {
+        message: err.message,
+        status: err.response?.status,
+        data: err.response?.data,
+      });
+
+      const e: any = new Error(
+        err.response?.data?.message || "Failed to create payment with Pesapal"
+      );
+      e.status = err.response?.status || 502;
+      e.details = err.response?.data;
+      throw e;
     }
   }
 

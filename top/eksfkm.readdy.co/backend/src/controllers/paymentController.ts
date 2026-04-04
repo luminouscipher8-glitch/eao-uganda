@@ -1,7 +1,9 @@
 import { AppError, asyncHandler } from '../middleware/errorHandler.js';
 import { ApiResponse, AuthenticatedRequest } from '../types/index.js';
 import { pesapalService } from '../services/pesapalService.js';
-import { DatabaseService } from '../services/database.js';
+import { DatabaseService } from '../services/database';
+import { Request, Response } from 'express';
+
 
 const db = new DatabaseService();
 
@@ -10,11 +12,16 @@ export class PaymentController {
    * Create donation payment
    */
   createDonationPayment = asyncHandler(async (req: AuthenticatedRequest, res: Response): Promise<void> => {
-    const { amount, donorName, donorEmail, donorPhone, message, currency = 'UGX' } = req.body;
+    const { amount, donorName, donorEmail, donorPhone, message, currency = 'UGX', isRecurring, campaign } = req.body;
 
     // Validate input
     if (!amount || amount <= 0) {
       throw new AppError('Valid donation amount is required', 400);
+    }
+
+    // Handle recurring donations - not currently supported
+    if (isRecurring) {
+      throw new AppError('Recurring donations are not currently supported. Please make a one-time donation.', 400);
     }
 
     // Generate unique references
@@ -25,7 +32,7 @@ export class PaymentController {
       const payment = await db.createPayment({
         type: 'DONATION',
         merchant_reference: merchantReference,
-        amount: Number(amount),
+        amount: amount as number,
         currency,
         status: 'PENDING',
         provider: 'pesapal',
@@ -37,27 +44,27 @@ export class PaymentController {
         },
       });
 
-      // Create donation record
-      const donation = await db.createDonation({
-        payment_id: payment.id,
-        donor_name: donorName,
-        donor_email: donorEmail,
-        donor_phone: donorPhone,
-        message,
-        amount: Number(amount),
-        currency,
-      });
+
+
 
       // Submit to Pesapal
+      const frontendBaseUrl =
+        process.env.FRONTEND_URL || 'http://localhost:5173';
+
+      const backendBaseUrl =
+        process.env.BACKEND_URL ||
+        process.env.API_BASE_URL ||
+        'http://localhost:3001';
+
       const pesapalResponse = await pesapalService.submitPayment({
-        amount: Number(amount),
+        amount: amount as number,
         currency,
         email: donorEmail || 'donor@eao-uganda.org',
         phone_number: donorPhone,
         first_name: donorName?.split(' ')[0] || 'Anonymous',
         last_name: donorName?.split(' ').slice(1).join(' ') || 'Donor',
-        callback_url: `${process.env.APP_BASE_URL}/api/pesapal/ipn`,
-        redirect_url: `${process.env.APP_BASE_URL}/donation/success?tracking_id={{order_tracking_id}}`,
+        callback_url: `${backendBaseUrl}/api/payments/pesapal/ipn`,
+        redirect_url: `${frontendBaseUrl}/donation/success?tracking_id={{order_tracking_id}}`,
         description: message || 'Support our mission to educate orphans in Uganda',
         reference: merchantReference,
       });
@@ -77,9 +84,20 @@ export class PaymentController {
       };
 
       res.status(200).json(response);
-    } catch (error) {
-      console.error('Failed to create donation payment:', error);
-      throw new AppError('Failed to create donation payment', 500);
+      return;
+    } catch (err: any) {
+      console.error('Failed to create donation payment:', err);
+
+      // Return structured error with status and details
+      const statusCode = err.status || 500;
+      const response: ApiResponse = {
+        success: false,
+        message: err.message || 'Failed to create donation payment',
+        ...(process.env.NODE_ENV === 'development' && { details: err.details }),
+      };
+
+      res.status(statusCode).json(response);
+      return;
     }
   });
 
@@ -106,7 +124,7 @@ export class PaymentController {
       const payment = await db.createPayment({
         type: 'SHOP',
         merchant_reference: merchantReference,
-        amount: Number(totalAmount),
+        amount: totalAmount as number,
         currency,
         status: 'PENDING',
         provider: 'pesapal',
@@ -120,22 +138,30 @@ export class PaymentController {
       const order = await db.createOrder({
         payment_id: payment.id,
         status: 'AWAITING_PAYMENT',
-        total_amount: Number(totalAmount),
+        total_amount: totalAmount as number,
         currency,
         customer_info: customerInfo,
         order_items: cartItems,
       });
 
       // Submit to Pesapal
+      const frontendBaseUrl =
+        process.env.FRONTEND_URL || 'http://localhost:5173';
+
+      const backendBaseUrl =
+        process.env.BACKEND_URL ||
+        process.env.API_BASE_URL ||
+        'http://localhost:3001';
+
       const pesapalResponse = await pesapalService.submitPayment({
-        amount: Number(totalAmount),
+        amount: totalAmount as number,
         currency,
         email: customerInfo.email,
         phone_number: customerInfo.phone,
         first_name: customerInfo.firstName,
         last_name: customerInfo.lastName,
-        callback_url: `${process.env.APP_BASE_URL}/api/pesapal/ipn`,
-        redirect_url: `${process.env.APP_BASE_URL}/shop/success?tracking_id={{order_tracking_id}}`,
+        callback_url: `${backendBaseUrl}/api/payments/pesapal/ipn`,
+        redirect_url: `${frontendBaseUrl}/shop/success?tracking_id={{order_tracking_id}}`,
         description: `Order for ${cartItems.length} items from EAO Shop`,
         reference: merchantReference,
       });
@@ -156,6 +182,7 @@ export class PaymentController {
       };
 
       res.status(200).json(response);
+      return;
     } catch (error) {
       console.error('Failed to create shop payment:', error);
       throw new AppError('Failed to create shop payment', 500);
@@ -166,7 +193,7 @@ export class PaymentController {
    * Get payment status
    */
   getPaymentStatus = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-    const { tracking_id } = req.query;
+    const { tracking_id } = req.query as { tracking_id?: string };
 
     if (!tracking_id) {
       throw new AppError('Tracking ID is required', 400);
@@ -214,6 +241,7 @@ export class PaymentController {
       };
 
       res.status(200).json(response);
+      return;
     } catch (error) {
       console.error('Failed to get payment status:', error);
       throw new AppError('Failed to get payment status', 500);
@@ -224,7 +252,12 @@ export class PaymentController {
    * Pesapal IPN/Webhook handler
    */
   handlePesapalIPN = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-    const { OrderTrackingId, OrderMerchantReference, PaymentStatus, PaymentMethod } = req.query;
+    const { OrderTrackingId, OrderMerchantReference, PaymentStatus, PaymentMethod } = req.query as { 
+      OrderTrackingId?: string; 
+      OrderMerchantReference?: string; 
+      PaymentStatus?: string; 
+      PaymentMethod?: string; 
+    };
 
     if (!OrderTrackingId || !OrderMerchantReference) {
       throw new AppError('Missing required IPN parameters', 400);
@@ -236,7 +269,8 @@ export class PaymentController {
       
       if (!payment) {
         console.warn(`Payment not found for tracking ID: ${OrderTrackingId}`);
-        return res.status(200).send('OK'); // Still acknowledge to Pesapal
+        res.status(200).send('OK'); // Still acknowledge to Pesapal
+        return;
       }
 
       // Verify with Pesapal to prevent spoofing
@@ -254,8 +288,8 @@ export class PaymentController {
 
       // If this is a donation and it's completed, you could trigger receipt email here
       if (payment.type === 'DONATION' && newStatus === 'COMPLETED') {
-        // TODO: Send receipt email
-        console.log(`Donation completed: ${payment.merchant_reference}`);
+        // TODO: Implement receipt email sending
+        console.log(`Donation completed: ${payment.merchant_reference} - Email receipt not yet implemented`);
       }
 
       // If this is a shop order and it's completed, update order status
@@ -269,10 +303,12 @@ export class PaymentController {
       
       // Respond with Pesapal's expected format
       res.status(200).send('OK');
+      return;
     } catch (error) {
       console.error('Failed to handle Pesapal IPN:', error);
       // Still respond with 200 to avoid retries
       res.status(200).send('OK');
+      return;
     }
   });
 }

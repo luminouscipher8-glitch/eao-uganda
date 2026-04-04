@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Get the real JWT secret from Supabase
-const supabaseUrl = 'https://rogxpucnkqwbeohpkolj.supabase.co';
+const supabaseUrl = 'https://https://merrqcqxvqvwfuohlxbs.supabase.co';
 const serviceRoleKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJvZ3hwdWNua3F3YmVvaHBrb2xqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2OTI3NDA5NCwiZXhwIjoyMDg0ODUwMDk0fQ.g9rLzYwClWX56zSD1Aanz-h3q3vLl-k0xUxfK7rffp8';
 
 const supabase = createClient(supabaseUrl, serviceRoleKey);

@@ -1,86 +1,57 @@
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { getPrograms, getSuccessStories } from '../../services/api';
 import { ProgramsStructuredData } from '../../components/seo/StructuredData';
 import { ImageWithFallback } from '../../components/common/ImageWithFallback';
+import { Program, SuccessStory } from '../../services/api';
 
 export default function ProgramsPage() {
   const [activeFilter, setActiveFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearchModal, setShowSearchModal] = useState(false);
+  const [, setPrograms] = useState<Program[]>([]);
+  const [successStories, setSuccessStories] = useState<SuccessStory[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const successStories = [
-    {
-      id: 1,
-      name: 'Amina Nakato',
-      age: 14,
-      story:
-        "When my parents passed away, I thought my education was over. Thanks to EAO, I'm now top of my class and dream of becoming a doctor.",
-      category: 'education',
-      impact: 'Top student in her class for 3 consecutive years',
-      image:
-        'https://readdy.ai/api/search-image?query=portrait%20of%20young%20Ugandan%20girl%20student%20in%20school%20uniform%20with%20books%2C%20confident%20smile%2C%20classroom%20background%2C%20hopeful%20expression%2C%15%20years%20old%2C%20educational%20success%20story%2C%20natural%20lighting&width=400&height=400&seq=success-story-001&orientation=squarish',
-    },
-    {
-      id: 2,
-      name: 'David Okello',
-      age: 16,
-      story:
-        'The sanitary support program changed everything. I no longer miss school during my period and can focus on my studies.',
-      category: 'community',
-      impact: '95% attendance rate since joining program',
-      image:
-        'https://readdy.ai/api/search-image?query=portrait%20of%20teenage%20Ugandan%20girl%20student%20confident%20and%20happy%2C%20school%20setting%2C%16%20years%20old%2C%20educational%20empowerment%2C%20natural%20lighting%2C%20authentic%20school%20environment&width=400&height=400&seq=success-story-002&orientation=squarish',
-    },
-    {
-      id: 3,
-      name: 'Sarah Nalubega',
-      age: 15,
-      story:
-        "Volunteers helped me with math after school. Now I'm helping other students and want to become a teacher myself.",
-      category: 'volunteer',
-      impact: 'Now tutors 5 younger students',
-      image:
-        'https://readdy.ai/api/search-image?query=portrait%20of%15%20year%20old%20Ugandan%20girl%20student%20helping%20other%20students%20with%20homework%2C%20peer%20tutoring%2C%20classroom%20setting%2C%20leadership%20and%20mentorship%2C%20natural%20lighting&width=400&height=400&seq=success-story-003&orientation=squarish',
-    },
-    {
-      id: 4,
-      name: 'Peter Ssebaggala',
-      age: 17,
-      story:
-        'With school fees covered, I can focus on my passion for science. I recently won a regional science competition!',
-      category: 'education',
-      impact: 'Regional science competition winner',
-      image:
-        'https://readdy.ai/api/search-image?query=portrait%20of%17%20year%20old%20Ugandan%20boy%20student%20with%20science%20project%2C%20laboratory%20setting%2C%20proud%20expression%2C%20academic%20achievement%2C%20science%20competition%20winner%2C%20natural%20lighting&width=400&height=400&seq=success-story-004&orientation=squarish',
-    },
-    {
-      id: 5,
-      name: 'Grace Nakimuli',
-      age: 13,
-      story:
-        'The new uniform made me feel proud. I participate in class now and have made many friends.',
-      category: 'community',
-      impact: 'Improved confidence and social skills',
-      image:
-        'https://readdy.ai/api/search-image?query=portrait%20of%13%20year%20old%20Ugandan%20girl%20student%20in%20new%20school%20uniform%2C%20happy%20and%20confident%2C%20school%20playground%2C%20social%20development%2C%20natural%20lighting&width=400&height=400&seq=success-story-005&orientation=squarish',
-    },
-    {
-      id: 6,
-      name: 'John Muwanga',
-      age: 18,
-      story:
-        "Mentorship from volunteers helped me apply to university. I'm the first in my family to attend higher education.",
-      category: 'volunteer',
-      impact: 'First in family to attend university',
-      image:
-        'https://readdy.ai/api/search-image?query=portrait%20of%18%20year%20old%20Ugandan%20student%20with%20university%20acceptance%20letter%2C%20proud%20moment%2C%20first-generation%20student%2C%20higher%20education%20achievement%2C%20natural%20lighting&width=400&height=400&seq=success-story-006&orientation=squarish',
-    },
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [programsResponse, storiesResponse] = await Promise.all([
+          getPrograms(),
+          getSuccessStories()
+        ]);
+
+        if (programsResponse.success && programsResponse.data) {
+          setPrograms(programsResponse.data);
+        } else {
+          console.error('Failed to load programs:', programsResponse.error);
+        }
+
+        if (storiesResponse.success && storiesResponse.data) {
+          setSuccessStories(storiesResponse.data);
+        } else {
+          console.error('Failed to load success stories:', storiesResponse.error);
+        }
+      } catch (err) {
+        console.error('Error fetching data:', err);
+        setError('Failed to load data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Use API data only - no fallback data to ensure real integration
+  const displaySuccessStories = successStories;
 
   const filteredStories =
     activeFilter === 'all'
-      ? successStories
-      : successStories.filter(story => story.category === activeFilter);
+      ? displaySuccessStories
+      : displaySuccessStories.filter(story => story.category === activeFilter);
 
   const searchedStories = searchQuery
     ? filteredStories.filter(
@@ -92,6 +63,38 @@ export default function ProgramsPage() {
     : filteredStories;
 
   const displayStories = searchedStories.slice(0, 3);
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-teal-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading programs...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md">
+            <h3 className="text-red-800 font-medium mb-2">Error Loading Data</h3>
+            <p className="text-red-600">{error}</p>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="mt-4 px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const filters = [
     { id: 'all', label: 'All Stories', icon: 'ri-grid-line' },
@@ -407,16 +410,15 @@ export default function ProgramsPage() {
             {/* Progress Tracker */}
             <div className="mb-12 sm:mb-16">
               <div className="bg-gray-100 rounded-full h-5 sm:h-6 overflow-hidden mb-3 sm:mb-4">
-                <div
-                  className="bg-gradient-to-r from-teal-600 to-amber-500 h-full rounded-full"
-                  style={{ width: '35%' }}
-                ></div>
+                <div className="school-progress-bar bg-gradient-to-r from-teal-600 to-amber-500 h-full rounded-full"></div>
               </div>
               <div className="flex justify-between text-xs sm:text-sm text-gray-600">
                 <span className="font-semibold text-teal-700">
                   35% Complete
                 </span>
-                <span>Target: UGX 2.5 Billion</span>
+                <div>
+                  <span>Target: UGX 2.5 Billion</span>
+                </div>
               </div>
             </div>
 
@@ -633,6 +635,8 @@ export default function ProgramsPage() {
                         All Success Stories
                       </h3>
                       <button
+                        type="button"
+                        aria-label="Close search modal"
                         onClick={() => {
                           setShowSearchModal(false);
                           setSearchQuery('');

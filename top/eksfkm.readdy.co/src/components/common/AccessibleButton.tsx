@@ -143,21 +143,24 @@ const AccessibleButton = forwardRef<
     }
 
     // Otherwise, render as button
-    return (
-      <button
-        ref={ref as React.Ref<HTMLButtonElement>}
-        type={type}
-        className={classes}
-        disabled={disabled || loading}
-        aria-label={ariaLabel}
-        aria-describedby={ariaDescribedBy}
-        aria-busy={loading}
-        onClick={handleClick}
-        {...props}
-      >
-        {buttonContent}
-      </button>
-    );
+   const isLoading = loading === true;
+
+const { ['aria-busy']: _ignoredAriaBusy, ...safeProps } = props;
+
+return (
+  <button
+    ref={ref as React.Ref<HTMLButtonElement>}
+    {...safeProps}
+    type={type}
+    className={classes}
+    disabled={disabled || isLoading}
+    aria-label={ariaLabel}
+    aria-describedby={ariaDescribedBy}
+    onClick={handleClick}
+  >
+    {buttonContent}
+  </button>
+);
   }
 );
 
