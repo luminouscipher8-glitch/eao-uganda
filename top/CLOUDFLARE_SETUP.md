@@ -21,7 +21,7 @@ Root directory: /
 
 ### **Environment Variables (Configured)**
 ```
-VITE_SUPABASE_URL = https://db.rogxpucnkqwbeohpkolj.supabase.co
+VITE_SUPABASE_URL = https://db.https://merrqcqxvqvwfuohlxbs.supabase.co
 VITE_SUPABASE_ANON_KEY = sb_publishable_5707Wm_xn45TSDx1haQyqg_hs71FryT
 VITE_API_URL = https://eao-uganda.onrender.com
 ```
