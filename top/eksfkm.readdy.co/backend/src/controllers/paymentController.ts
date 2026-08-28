@@ -1,6 +1,7 @@
 import { AppError, asyncHandler } from '../middleware/errorHandler.js';
 import { ApiResponse, AuthenticatedRequest } from '../types/index.js';
 import { pesapalService } from '../services/pesapalService.js';
+import { sendEmail } from '../services/emailService.js';
 import { DatabaseService } from '../services/database';
 import { Request, Response } from 'express';
 
@@ -286,11 +287,23 @@ export class PaymentController {
         payment_method: pesapalStatus.payment_method,
       });
 
-      // If this is a donation and it's completed, you could trigger receipt email here
-      if (payment.type === 'DONATION' && newStatus === 'COMPLETED') {
-        // TODO: Implement receipt email sending
-        console.log(`Donation completed: ${payment.merchant_reference} - Email receipt not yet implemented`);
-      }
+      // If this is a donation and it's completed, trigger receipt email
+        if (payment.type === 'DONATION' && newStatus === 'COMPLETED') {
+          try {
+            const donorEmail = payment.metadata?.donorEmail;
+            const donorName = payment.metadata?.donorName || 'Donor';
+            if (donorEmail) {
+              const subject = `Donation receipt - ${payment.merchant_reference}`;
+              const html = `<p>Dear ${donorName},</p><p>Thank you for your donation of ${payment.amount} ${payment.currency}. Your reference is ${payment.merchant_reference}.</p><p>Sincerely,<br/>EAO</p>`;
+              const result = await sendEmail({ to: donorEmail, subject, html });
+              console.log('Donation receipt send result:', result);
+            } else {
+              console.log('Donation completed but no donor email present; skipping receipt.');
+            }
+          } catch (err) {
+            console.error('Failed to send donation receipt:', err);
+          }
+        }
 
       // If this is a shop order and it's completed, update order status
       if (payment.type === 'SHOP' && newStatus === 'COMPLETED') {
