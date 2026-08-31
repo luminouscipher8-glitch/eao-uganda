@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useAnalyticsContext } from '../components/providers/AnalyticsProvider';
+import { useAnalyticsContext } from '../components/providers/AnalyticsProvider.tsx';
 
 // Core Web Vitals types
 export interface CoreWebVitals {

@@ -1,5 +1,5 @@
 import { useCallback, useRef } from 'react';
-import { toast } from '../components/common/Toast';
+import { toast } from '../components/common/Toast.tsx';
 
 // Error severity levels
 export enum ErrorSeverity {

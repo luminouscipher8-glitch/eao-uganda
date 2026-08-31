@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useHomePageDemo } from '../../hooks/useContentfulDemo';
-import { ImageWithFallback } from '../common/ImageWithFallback';
+import { useHomePageDemo } from '../../hooks/useContentfulDemo.ts';
+import { ImageWithFallback } from '../common/ImageWithFallback.tsx';
 
 const HeroSection: React.FC = () => {
   const { data, loading, error } = useHomePageDemo();

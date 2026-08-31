@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { useLoading } from '../../components/providers/LoadingProvider';
-import { toast } from '../../components/common/Toast';
-import { useAnalyticsContext } from '../../components/providers/AnalyticsProvider';
-import { createShopPayment, redirectToPesapal } from '../../services/pesapalApi';
-import { PesapalShopPaymentRequest } from '../../services/pesapalApi';
+import { useLoading } from '../../components/providers/LoadingProvider.tsx';
+import { toast } from '../../components/common/Toast.tsx';
+import { useAnalyticsContext } from '../../components/providers/AnalyticsProvider.tsx';
+import { createShopPayment, redirectToPesapal } from '../../services/pesapalApi.ts';
+import { PesapalShopPaymentRequest } from '../../services/pesapalApi.ts';
 
 export default function ShopPage() {
   const [cartItems, setCartItems] = useState<any[]>([]);

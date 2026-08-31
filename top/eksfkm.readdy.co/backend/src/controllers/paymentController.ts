@@ -2,7 +2,7 @@ import { AppError, asyncHandler } from '../middleware/errorHandler.js';
 import { ApiResponse, AuthenticatedRequest } from '../types/index.js';
 import { pesapalService } from '../services/pesapalService.js';
 import { sendEmail } from '../services/emailService.js';
-import { DatabaseService } from '../services/database';
+import { DatabaseService } from '../services/database.js';
 import { Request, Response } from 'express';
 
 

@@ -1,15 +1,15 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
-import ErrorBoundary from './components/common/ErrorBoundary';
-import { LoadingProvider } from './components/providers/LoadingProvider';
-import { ToastProvider } from './components/common/Toast';
-import { AnalyticsProvider } from './components/providers/AnalyticsProvider';
-import { HomeStructuredData } from './components/seo/StructuredData';
-import SocialMediaMeta from './components/seo/SocialMediaMeta';
-import Header from './components/layout/Header';
-import Footer from './components/layout/Footer';
-import ScrollToTop from './components/common/ScrollToTop';
-import routes from './router/config';
-import { AuthProvider } from './contexts/AuthContext';
+import ErrorBoundary from './components/common/ErrorBoundary.tsx';
+import { LoadingProvider } from './components/providers/LoadingProvider.tsx';
+import { ToastProvider } from './components/common/Toast.tsx';
+import { AnalyticsProvider } from './components/providers/AnalyticsProvider.tsx';
+import { HomeStructuredData } from './components/seo/StructuredData.tsx';
+import SocialMediaMeta from './components/seo/SocialMediaMeta.tsx';
+import Header from './components/layout/Header.tsx';
+import Footer from './components/layout/Footer.tsx';
+import ScrollToTop from './components/common/ScrollToTop.tsx';
+import routes from './router/config.tsx';
+import { AuthProvider } from './contexts/AuthContext.tsx';
 import './styles/toast-animations.css';
 
 function AppRoutes() {

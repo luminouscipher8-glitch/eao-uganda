@@ -8,7 +8,7 @@ import {
   FadeIn,
   Typewriter,
   Counter,
-} from '../MicroInteractions';
+} from '../MicroInteractions.tsx';
 
 describe('HoverCard', () => {
   it('renders children correctly', () => {
@@ -22,7 +22,7 @@ describe('HoverCard', () => {
   });
 
   it('applies hover effects on mouse enter', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.default.setup();
     render(
       <HoverCard>
         <div>Test Content</div>
@@ -37,7 +37,7 @@ describe('HoverCard', () => {
   });
 
   it('removes hover effects on mouse leave', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.default.setup();
     render(
       <HoverCard>
         <div>Test Content</div>
@@ -65,7 +65,7 @@ describe('BounceButton', () => {
   });
 
   it('handles click events', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.default.setup();
     const handleClick = vi.fn();
 
     render(<BounceButton onClick={handleClick}>Click me</BounceButton>);
@@ -85,7 +85,7 @@ describe('BounceButton', () => {
   });
 
   it('applies bounce effect on click', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.default.setup();
 
     render(<BounceButton>Click me</BounceButton>);
 

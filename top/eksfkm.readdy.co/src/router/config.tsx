@@ -3,32 +3,32 @@ import { RouteObject } from 'react-router-dom';
 import SuspenseWrapper from '../components/common/SuspenseWrapper.tsx';
 
 // Lazy loaded components with error boundaries
-const HomePage = lazy(() => import('../pages/home/page'));
-const AboutPage = lazy(() => import('../pages/about/page'));
-const ProgramsPage = lazy(() => import('../pages/programs/page'));
-const GetInvolvedPage = lazy(() => import('../pages/get-involved/page'));
-const DonatePage = lazy(() => import('../pages/donate/page'));
-const DonationSuccessPage = lazy(() => import('../pages/donation/success'));
-const ContactPage = lazy(() => import('../pages/contact/page'));
-const StockGiftsPage = lazy(() => import('../pages/stock-gifts/page'));
-const PlannedGivingPage = lazy(() => import('../pages/planned-giving/page'));
+const HomePage = lazy(() => import('../pages/home/page.tsx'));
+const AboutPage = lazy(() => import('../pages/about/page.tsx'));
+const ProgramsPage = lazy(() => import('../pages/programs/page.tsx'));
+const GetInvolvedPage = lazy(() => import('../pages/get-involved/page.tsx'));
+const DonatePage = lazy(() => import('../pages/donate/page.tsx'));
+const DonationSuccessPage = lazy(() => import('../pages/donation/success.tsx'));
+const ContactPage = lazy(() => import('../pages/contact/page.tsx'));
+const StockGiftsPage = lazy(() => import('../pages/stock-gifts/page.tsx'));
+const PlannedGivingPage = lazy(() => import('../pages/planned-giving/page.tsx'));
 const CorporateSponsorshipPage = lazy(
-  () => import('../pages/corporate-sponsorship/page')
+  () => import('../pages/corporate-sponsorship/page.tsx')
 );
 const FinancialReportsPage = lazy(
-  () => import('../pages/financial-reports/page')
+  () => import('../pages/financial-reports/page.tsx')
 );
-const PartnersPage = lazy(() => import('../pages/partners/page'));
-const ShopPage = lazy(() => import('../pages/shop/page'));
-const ShopSuccessPage = lazy(() => import('../pages/shop/success'));
-const BlogPage = lazy(() => import('../pages/blog/page'));
-const BlogPostPage = lazy(() => import('../pages/blog/[id]/page'));
-const NotFoundPage = lazy(() => import('../pages/NotFound'));
+const PartnersPage = lazy(() => import('../pages/partners/page.tsx'));
+const ShopPage = lazy(() => import('../pages/shop/page.tsx'));
+const ShopSuccessPage = lazy(() => import('../pages/shop/success.tsx'));
+const BlogPage = lazy(() => import('../pages/blog/page.tsx'));
+const BlogPostPage = lazy(() => import('../pages/blog/[id]/page.tsx'));
+const NotFoundPage = lazy(() => import('../pages/NotFound.tsx'));
 
 // Admin routes
-const AdminLogin = lazy(() => import('../pages/admin/login/page'));
-const AdminDashboard = lazy(() => import('../pages/admin/dashboard/page'));
-const AdminPrograms = lazy(() => import('../pages/admin/programs/page'));
+const AdminLogin = lazy(() => import('../pages/admin/login/page.tsx'));
+const AdminDashboard = lazy(() => import('../pages/admin/dashboard/page.tsx'));
+const AdminPrograms = lazy(() => import('../pages/admin/programs/page.tsx'));
 // Route metadata for SEO and analytics
 const routeMeta: Record<string, { title: string; description: string }> = {
   '/': {

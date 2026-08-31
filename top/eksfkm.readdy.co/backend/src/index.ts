@@ -10,22 +10,22 @@ import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
 // Middleware & Routes
-import { errorHandler } from './middleware/errorHandler';
-import { userRoutes } from './routes/users';
-import { contactRoutes } from './routes/contact';
-import { donationRoutes } from './routes/donations';
-import { analyticsRoutes } from './routes/analytics';
-import { healthRoutes } from './routes/health';
-import { adminRoutes } from './routes/admin';
-import { uploadRoutes } from './routes/uploads';
-import { paymentRoutes } from './routes/payments';
-import { programsRoutes } from './routes/programs';
-import { eventsRoutes } from './routes/events';
-import { successStoriesRoutes } from './routes/successStories';
-import { financialReportsRoutes } from './routes/financialReports';
-import { volunteerRoutes } from './routes/volunteers';
-import { newsletterRoutes } from './routes/newsletter';
-import { verificationRoutes } from './routes/verification';
+import {errorHandler} from './middleware/errorHandler.js';
+import {userRoutes} from './routes/users.js';
+import {contactRoutes} from './routes/contact.js';
+import {donationRoutes} from './routes/donations.js';
+import {analyticsRoutes} from './routes/analytics.js';
+import {healthRoutes} from './routes/health.js';
+import {adminRoutes} from './routes/admin.js';
+import {uploadRoutes} from './routes/uploads.js';
+import {paymentRoutes} from './routes/payments.js';
+import {programsRoutes} from './routes/programs.js';
+import {eventsRoutes} from './routes/events.js';
+import {successStoriesRoutes} from './routes/successStories.js';
+import {financialReportsRoutes} from './routes/financialReports.js';
+import {volunteerRoutes} from './routes/volunteers.js';
+import {newsletterRoutes} from './routes/newsletter.js';
+import {verificationRoutes} from './routes/verification.js';
 
 dotenv.config();
 

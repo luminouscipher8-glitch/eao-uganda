@@ -6,9 +6,9 @@ import {
   Calendar,
   Wallet,
 } from 'lucide-react';
-import { useAdminApi } from '../../hooks/useAdminApi';
-import { SchoolBuilding, SchoolBuildingFormData } from '../../services/adminApi';
-import Modal from './Modal';
+import { useAdminApi } from '../../hooks/useAdminApi.ts';
+import { SchoolBuilding, SchoolBuildingFormData } from '../../services/adminApi.ts';
+import Modal from './Modal.tsx';
 
 const getStatusColorClasses = (status: string) => {
   switch (status) {

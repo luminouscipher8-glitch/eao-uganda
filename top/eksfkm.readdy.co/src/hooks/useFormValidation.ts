@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import React from 'react';
-import { useErrorLogger } from './useErrorLogger';
+import { useErrorLogger } from './useErrorLogger.ts';
 
 // Validation rule types
 export type ValidationRule<T = any> = {

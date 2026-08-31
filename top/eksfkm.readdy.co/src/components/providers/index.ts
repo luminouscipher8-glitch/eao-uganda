@@ -1,1 +1,1 @@
-export { LoadingProvider } from './LoadingProvider';
+export { LoadingProvider } from './LoadingProvider.tsx';

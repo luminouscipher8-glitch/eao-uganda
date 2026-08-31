@@ -8,7 +8,7 @@ const baseUrl = env === 'production' ? 'https://pay.pesapal.com/pesapalv3' : 'ht
 
 async function main() {
   try {
-    const mod = await import('../services/pesapalService');
+    const mod = await import('../services/pesapalService.js');
     const pesapalService = (mod as any).pesapalService;
     const token = await pesapalService.checkAccessToken();
 

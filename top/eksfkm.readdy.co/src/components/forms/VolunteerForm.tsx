@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { toast } from '../common/Toast';
-import { submitVolunteerForm, VolunteerFormData } from '../../services/api';
+import { toast } from '../common/Toast.tsx';
+import { submitVolunteerForm, VolunteerFormData } from '../../services/api.ts';
 
 export default function VolunteerForm() {
   const [formData, setFormData] = useState<VolunteerFormData>({

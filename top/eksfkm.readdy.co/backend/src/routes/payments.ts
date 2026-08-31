@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { body } from 'express-validator';
-import { asyncHandler } from '../middleware/errorHandler';
-import { PaymentController } from '../controllers/paymentController';
+import { asyncHandler } from '../middleware/errorHandler.js';
+import { PaymentController } from '../controllers/paymentController.js';
 
 const router = Router();
 const paymentController = new PaymentController();

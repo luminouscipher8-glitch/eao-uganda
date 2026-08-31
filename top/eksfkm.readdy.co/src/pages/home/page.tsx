@@ -1,12 +1,12 @@
 import { Link } from 'react-router-dom';
 import { useEffect } from 'react';
-import OptimizedImage from '../../components/common/OptimizedImage';
-import { preloadCriticalImages } from '../../utils/imagePreloader';
+import OptimizedImage from '../../components/common/OptimizedImage.tsx';
+import { preloadCriticalImages } from '../../utils/imagePreloader.ts';
 import {
   Counter,
   SlideIn,
   FadeIn,
-} from '../../components/common/MicroInteractions';
+} from '../../components/common/MicroInteractions.tsx';
 
 export default function HomePage() {
   useEffect(() => {

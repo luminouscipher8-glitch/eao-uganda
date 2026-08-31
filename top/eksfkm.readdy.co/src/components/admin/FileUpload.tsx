@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Upload, X } from 'lucide-react';
-import { supabase } from '../../contexts/AuthContext';
+import { supabase } from '../../contexts/AuthContext.tsx';
 
 interface FileUploadProps {
   label: string;

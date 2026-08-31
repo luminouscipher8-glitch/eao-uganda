@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { getPrograms, getSuccessStories } from '../../services/api';
-import { ProgramsStructuredData } from '../../components/seo/StructuredData';
-import { ImageWithFallback } from '../../components/common/ImageWithFallback';
-import { Program, SuccessStory } from '../../services/api';
+import { getPrograms, getSuccessStories } from '../../services/api.ts';
+import { ProgramsStructuredData } from '../../components/seo/StructuredData.tsx';
+import { ImageWithFallback } from '../../components/common/ImageWithFallback.tsx';
+import { Program, SuccessStory } from '../../services/api.ts';
 
 export default function ProgramsPage() {
   const [activeFilter, setActiveFilter] = useState('all');

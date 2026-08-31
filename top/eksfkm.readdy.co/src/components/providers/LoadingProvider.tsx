@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, ReactNode } from 'react';
-import { FullPageLoader } from '../common/Loader';
+import { FullPageLoader } from '../common/Loader.tsx';
 
 interface LoadingContextType {
   isLoading: boolean;

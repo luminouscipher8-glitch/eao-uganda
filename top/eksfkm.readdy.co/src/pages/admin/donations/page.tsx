@@ -1,4 +1,4 @@
-import AdminLayout from '../../../components/admin/AdminLayout';
+import AdminLayout from '../../../components/admin/AdminLayout.tsx';
 
 export default function AdminDonations() {
   return (

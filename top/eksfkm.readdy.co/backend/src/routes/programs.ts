@@ -1,7 +1,7 @@
 // backend/src/routes/programs.ts
 import { Router, Request, Response } from 'express';
 import { ApiResponse } from '../types/index.js';
-import { prisma } from '../utils/prismaClient';
+import { prisma } from '../utils/prismaClient.js';
 import { asyncHandler } from '../middleware/errorHandler.js';
 import type { Program } from '@prisma/client';
 

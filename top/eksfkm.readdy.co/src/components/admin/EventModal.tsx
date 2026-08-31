@@ -9,9 +9,9 @@ import {
   Star,
   DollarSign
 } from 'lucide-react';
-import { useAdminApi } from '../../hooks/useAdminApi';
-import { Event, EventFormData } from '../../services/adminApi';
-import Modal from './Modal';
+import { useAdminApi } from '../../hooks/useAdminApi.ts';
+import { Event, EventFormData } from '../../services/adminApi.ts';
+import Modal from './Modal.tsx';
 
 const statusColors = {
   upcoming: 'yellow',

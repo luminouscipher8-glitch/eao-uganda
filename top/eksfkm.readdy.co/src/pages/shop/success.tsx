@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useLoading } from '../../components/providers/LoadingProvider';
-import { toast } from '../../components/common/Toast';
-import { useAnalyticsContext } from '../../components/providers/AnalyticsProvider';
-import { pollPaymentStatus, getTrackingIdFromUrl } from '../../services/pesapalApi';
-import { PaymentStatusResponse } from '../../services/pesapalApi';
+import { useLoading } from '../../components/providers/LoadingProvider.tsx';
+import { toast } from '../../components/common/Toast.tsx';
+import { useAnalyticsContext } from '../../components/providers/AnalyticsProvider.tsx';
+import { pollPaymentStatus, getTrackingIdFromUrl } from '../../services/pesapalApi.ts';
+import { PaymentStatusResponse } from '../../services/pesapalApi.ts';
 
 export default function ShopSuccessPage() {
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatusResponse | null>(null);

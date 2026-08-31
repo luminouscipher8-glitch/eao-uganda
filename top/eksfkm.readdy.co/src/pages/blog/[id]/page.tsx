@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import OptimizedImage from '../../../components/common/OptimizedImage';
-import { FadeIn, SlideIn } from '../../../components/common/MicroInteractions';
+import OptimizedImage from '../../../components/common/OptimizedImage.tsx';
+import { FadeIn, SlideIn } from '../../../components/common/MicroInteractions.tsx';
 import { Calendar, Clock, User, ArrowLeft, Heart, MessageCircle, Share2, Bookmark, Eye, Tag } from 'lucide-react';
 
 // Mock blog post data (in a real app, this would come from an API)

@@ -1,10 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
-import {
-  useKeyboardNavigation,
-  useFocusManagement,
-} from '../../hooks/useKeyboardNavigation';
-import AccessibleButton from '../common/AccessibleButton';
+import { useKeyboardNavigation, useFocusManagement } from "../../hooks/useKeyboardNavigation.js";
+import AccessibleButton from '../common/AccessibleButton.tsx';
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);

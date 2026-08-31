@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, ReactNode } from 'react';
-import { useAnalytics } from '../../hooks/useAnalytics';
+import { useAnalytics } from '../../hooks/useAnalytics.ts';
 
 interface AnalyticsContextType {
   trackPageView: (path: string, title?: string) => void;
@@ -34,7 +34,7 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({
   // Track scroll depth
   useEffect(() => {
     let maxScrollDepth = 0;
-    let scrollTimeout: NodeJS.Timeout;
+    let scrollTimeout: ReturnType<typeof setTimeout>;
 
     const handleScroll = () => {
       const scrollHeight =

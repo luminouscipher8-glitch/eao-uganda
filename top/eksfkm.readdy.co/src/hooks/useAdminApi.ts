@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { adminApi, ApiResponse } from '../services/adminApi';
+import { adminApi, ApiResponse } from '../services/adminApi.ts';
 
 // Generic hook for API calls with loading and error states
 export function useApi<T>(

@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import AccessibleButton from '../AccessibleButton';
+import AccessibleButton from '../AccessibleButton.tsx';
 import { BrowserRouter } from 'react-router-dom';
 
 const renderWithRouter = (component: React.ReactElement) => {
@@ -111,7 +111,7 @@ describe('AccessibleButton', () => {
   });
 
   it('handles click events', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.default.setup();
     const handleClick = vi.fn();
 
     render(<AccessibleButton onClick={handleClick}>Click me</AccessibleButton>);
@@ -123,7 +123,7 @@ describe('AccessibleButton', () => {
   });
 
   it('handles keyboard events', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.default.setup();
     const handleClick = vi.fn();
 
     render(<AccessibleButton onClick={handleClick}>Click me</AccessibleButton>);

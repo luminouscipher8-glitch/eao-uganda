@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import { useLoading } from '../providers/LoadingProvider';
+import { useLoading } from '../providers/LoadingProvider.tsx';
 
 interface Props {
   children: React.ReactNode;

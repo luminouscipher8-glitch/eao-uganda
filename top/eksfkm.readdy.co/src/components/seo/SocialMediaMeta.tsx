@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import {
   useSocialMediaMeta,
   type SocialMediaMeta,
-} from '../../hooks/useSocialMediaMeta';
+} from '../../hooks/useSocialMediaMeta.ts';
 
 interface SocialMediaMetaProps {
   customMeta?: Partial<SocialMediaMeta>;

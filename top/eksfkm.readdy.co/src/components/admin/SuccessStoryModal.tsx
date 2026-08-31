@@ -8,9 +8,9 @@ import {
   Heart,
   Users
 } from 'lucide-react';
-import { useAdminApi } from '../../hooks/useAdminApi';
-import { SuccessStory, SuccessStoryFormData } from '../../services/adminApi';
-import Modal from './Modal';
+import { useAdminApi } from '../../hooks/useAdminApi.js';
+import { SuccessStory, SuccessStoryFormData } from '../../services/adminApi.tsx';
+import Modal from './Modal.tsx';
 
 const categoryIcons = {
   education: BookOpen,

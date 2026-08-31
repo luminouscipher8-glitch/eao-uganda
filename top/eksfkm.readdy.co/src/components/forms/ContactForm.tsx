@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { toast } from '../common/Toast';
-import { submitContactForm, ContactFormData } from '../../services/api';
+import { toast } from '../common/Toast.tsx';
+import { submitContactForm, ContactFormData } from '../../services/api.ts';
 
 export default function ContactForm() {
   const [formData, setFormData] = useState<ContactFormData>({

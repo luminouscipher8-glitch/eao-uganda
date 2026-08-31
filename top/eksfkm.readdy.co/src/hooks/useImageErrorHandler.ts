@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { toast } from '../components/common/Toast';
+import { toast } from '../components/common/Toast.tsx';
 
 interface ImageErrorInfo {
   src: string;

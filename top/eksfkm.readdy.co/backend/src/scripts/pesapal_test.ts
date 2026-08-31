@@ -25,7 +25,7 @@ async function main() {
     }
 
     // Import service and attempt access token fetch (diagnostic)
-    const mod = await import('../services/pesapalService');
+    const mod = await import('../services/pesapalService.js');
     const pesapalService = (mod as any).pesapalService;
 
     console.log('Attempting to fetch an access token from Pesapal (this calls the remote API)...');

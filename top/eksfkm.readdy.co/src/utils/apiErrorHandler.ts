@@ -1,4 +1,4 @@
-import { useErrorLogger, ErrorCategory } from '../hooks/useErrorLogger';
+import { useErrorLogger, ErrorCategory } from '../hooks/useErrorLogger.ts';
 
 // API Error types
 export interface ApiError {

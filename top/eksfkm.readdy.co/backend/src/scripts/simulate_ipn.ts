@@ -1,14 +1,14 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import { DatabaseService } from '../services/database';
-import { PaymentController } from '../controllers/paymentController';
-import { pesapalService } from '../services/pesapalService';
+import { DatabaseService } from '../services/database.js';
+import { PaymentController } from '../controllers/paymentController.js';
+import { pesapalService } from '../services/pesapalService.js';
 
 async function run() {
   // Use an in-memory mock for DatabaseService methods so no real DB is required
   const inMemoryStore: Record<string, any> = {};
-  const dbModule = await import('../services/database');
+  const dbModule = await import('../services/database.js');
   const DatabaseServiceClass = (dbModule as any).DatabaseService;
 
   DatabaseServiceClass.prototype.createPayment = async function (data: any) {

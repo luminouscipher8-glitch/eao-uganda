@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useLoading } from '../../components/providers/LoadingProvider';
-import { toast } from '../../components/common/Toast';
-import { useAnalyticsContext } from '../../components/providers/AnalyticsProvider';
-import { pollPaymentStatus, getTrackingIdFromUrl } from '../../services/pesapalApi';
-import { PaymentStatusResponse } from '../../services/pesapalApi';
+import { useLoading } from '../../components/providers/LoadingProvider.tsx';
+import { toast } from '../../components/common/Toast.js';
+import { useAnalyticsContext } from '../../components/providers/AnalyticsProvider.js';
+import { pollPaymentStatus, getTrackingIdFromUrl } from '../../services/pesapalApi.js';
+import { PaymentStatusResponse } from '../../services/pesapalApi.js';
 
 export default function DonationSuccessPage() {
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatusResponse | null>(null);

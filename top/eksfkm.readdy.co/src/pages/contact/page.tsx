@@ -1,5 +1,5 @@
-import { ContactStructuredData } from '../../components/seo/StructuredData';
-import ContactForm from '../../components/forms/ContactForm';
+import { ContactStructuredData } from '../../components/seo/StructuredData.tsx';
+import ContactForm from '../../components/forms/ContactForm.tsx';
 
 export default function ContactPage() {
   return (

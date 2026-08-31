@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import { supabase } from '../lib/supabase';
+import { supabase } from '../lib/supabase.js';
 
 async function main() {
   const merchant = process.argv[2];

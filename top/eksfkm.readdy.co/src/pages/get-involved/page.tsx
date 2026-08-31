@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
-import { GetInvolvedStructuredData } from '../../components/seo/StructuredData';
-import { ImageWithFallback } from '../../components/common/ImageWithFallback';
-import VolunteerForm from '../../components/forms/VolunteerForm';
+import { GetInvolvedStructuredData } from '../../components/seo/StructuredData.tsx';
+import { ImageWithFallback } from "../../components/common/ImageWithFallback.js";
+import VolunteerForm from '../../components/forms/VolunteerForm.tsx';
 
 export default function GetInvolvedPage() {
 

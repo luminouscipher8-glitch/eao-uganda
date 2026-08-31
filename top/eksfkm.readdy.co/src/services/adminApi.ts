@@ -1,4 +1,4 @@
-import { supabase } from '../contexts/AuthContext';
+import { supabase } from '../contexts/AuthContext.tsx';
 
 // API response types
 export interface ApiResponse<T> {

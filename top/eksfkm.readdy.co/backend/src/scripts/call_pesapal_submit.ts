@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-const mod = await import('../services/pesapalService');
+const mod = await import('../services/pesapalService.js');
 const pesapalService = (mod as any).pesapalService;
 
 async function main() {

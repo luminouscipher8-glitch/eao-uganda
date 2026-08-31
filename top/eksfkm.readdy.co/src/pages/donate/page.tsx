@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { useLoading } from '../../components/providers/LoadingProvider';
-import { toast } from '../../components/common/Toast';
-import { useAnalyticsContext } from '../../components/providers/AnalyticsProvider';
-import { useErrorLogger } from '../../hooks/useErrorLogger';
-import { DonateStructuredData } from '../../components/seo/StructuredData';
-import { createDonationPayment, redirectToPesapal } from '../../services/pesapalApi';
-import { PesapalPaymentRequest } from '../../services/pesapalApi';
+import { useLoading } from '../../components/providers/LoadingProvider.js';
+import { toast } from '../../components/common/Toast.js';
+import { useAnalyticsContext } from '../../components/providers/AnalyticsProvider.js';
+import { useErrorLogger } from '../../hooks/useErrorLogger.js';
+import { DonateStructuredData } from '../../components/seo/StructuredData.js';
+import { createDonationPayment, redirectToPesapal } from '../../services/pesapalApi.js';
+import { PesapalPaymentRequest } from '../../services/pesapalApi.js';
 
 export default function DonatePage() {
   const [amount, setAmount] = useState('');

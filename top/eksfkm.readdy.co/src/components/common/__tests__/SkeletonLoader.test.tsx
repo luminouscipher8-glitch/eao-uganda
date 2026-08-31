@@ -4,7 +4,7 @@ import SkeletonLoader, {
   CardSkeleton,
   ListSkeleton,
   TableSkeleton,
-} from '../SkeletonLoader';
+} from '../SkeletonLoader.tsx';
 
 describe('SkeletonLoader', () => {
   it('renders with default props', () => {

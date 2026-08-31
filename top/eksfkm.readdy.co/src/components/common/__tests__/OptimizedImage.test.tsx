@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import OptimizedImage from '../OptimizedImage';
-import { LoadingProvider } from '../../providers/LoadingProvider';
+import OptimizedImage from '../OptimizedImage.tsx';
+import { LoadingProvider } from '../../providers/LoadingProvider.tsx';
 
 // Mock IntersectionObserver
 const mockIntersectionObserver = vi.fn();

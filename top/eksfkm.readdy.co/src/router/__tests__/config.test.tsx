@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import routes, { routeMeta } from '../config';
+import routes, { routeMeta } from '../config.tsx';
 
 describe('Route Configuration', () => {
   it('should have the correct number of routes', () => {

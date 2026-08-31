@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useStructuredData } from '../../hooks/useStructuredData';
+import { useStructuredData } from '../../hooks/useStructuredData.ts';
 
 interface StructuredDataProps {
   type:

@@ -7,12 +7,26 @@ import {
   Plus,
   Edit,
 } from 'lucide-react';
-import AdminLayout from '../../../components/admin/AdminLayout';
-import { ProtectedRoute } from '../../../components/admin/ProtectedRoute';
-import { useDashboardStats } from '../../../hooks/useAdminApi';
+import AdminLayout from '../../../components/admin/AdminLayout.js';
+import { ProtectedRoute } from '../../../components/admin/ProtectedRoute.js';
+import { useDashboardStats } from '../../../hooks/useAdminApi.js';
+
+interface DashboardStats {
+  totalPrograms: number;
+  totalContacts: number;
+  totalDonations: number;
+  totalVolunteers: number;
+  recentActivity: Array<{
+    id: string;
+    message?: string;
+    description?: string;
+    time?: string;
+    date: string;
+  }>;
+}
 
 export default function AdminDashboard() {
-  const { data: stats, loading, error } = useDashboardStats();
+  const { data: stats, loading, error } = useDashboardStats() as { data: DashboardStats | null; loading: boolean; error: string | null };
 
   if (loading) {
     return (
@@ -159,7 +173,7 @@ export default function AdminDashboard() {
                   </div>
                 ) : (
                   <div className="divide-y divide-gray-200">
-                    {recentActivity.map((activity: any) => (
+                    {recentActivity.map((activity) => (
                       <div key={activity.id} className="p-4 flex items-center gap-4">
                         <div className="flex-shrink-0">
                           <div className="p-2 bg-gray-100 rounded-lg">
@@ -168,9 +182,9 @@ export default function AdminDashboard() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-gray-900">
-                            {activity.message}
+                            {activity.message || activity.description}
                           </p>
-                          <p className="text-sm text-gray-500">{activity.time}</p>
+                          <p className="text-sm text-gray-500">{activity.time || activity.date}</p>
                         </div>
                       </div>
                     ))}

@@ -3,7 +3,7 @@ import {
   ErrorCategory,
   ErrorSeverity,
   useErrorLogger,
-} from '../../hooks/useErrorLogger';
+} from '../../hooks/useErrorLogger.tsx';
 
 interface EnhancedErrorBoundaryProps {
   children: ReactNode;

@@ -8,7 +8,7 @@ async function main() {
   console.log('Registering Pesapal IPN callback URL:', callbackUrl);
 
   try {
-    const mod = await import('../services/pesapalService');
+    const mod = await import('../services/pesapalService.js');
     const pesapalService = (mod as any).pesapalService;
     const id = await pesapalService.registerIPN(callbackUrl);
     console.log('Pesapal registerIPN returned:', id);

@@ -6,9 +6,9 @@ import {
   Users,
   Building2,
 } from 'lucide-react';
-import { useAdminApi } from '../../hooks/useAdminApi';
-import { Program } from '../../services/adminApi';
-import Modal from './Modal';
+import { useAdminApi } from '../../hooks/useAdminApi.js';
+import { Program } from '../../services/adminApi.tsx';
+import Modal from './Modal.tsx';
 
 const categoryIcons = {
   education: BookOpen,

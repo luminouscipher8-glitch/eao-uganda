@@ -5,8 +5,8 @@ import {
 } from 'react-router-dom';
 import { useRoutes } from 'react-router-dom';
 import { useEffect } from 'react';
-import routes, { routeMeta } from './config';
-import { usePerformance } from '../hooks/usePerformance';
+import routes, { routeMeta } from './config.tsx';
+import { usePerformance } from '../hooks/usePerformance.ts';
 
 let navigateResolver: (navigate: ReturnType<typeof useNavigate>) => void;
 

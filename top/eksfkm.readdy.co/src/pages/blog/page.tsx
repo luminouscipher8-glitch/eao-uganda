@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import OptimizedImage from '../../components/common/OptimizedImage';
-import { FadeIn, SlideIn } from '../../components/common/MicroInteractions';
+import OptimizedImage from '../../components/common/OptimizedImage.tsx';
+import { FadeIn, SlideIn } from '../../components/common/MicroInteractions.tsx';
 import { Clock, User, ArrowRight, Search, Heart, MessageCircle, Eye } from 'lucide-react';
 
 // Mock blog data

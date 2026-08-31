@@ -1,4 +1,4 @@
-import routes from '../router/config';
+import routes from '../router/config.tsx';
 import { RouteObject } from 'react-router-dom';
 
 // Sitemap URL interface

@@ -14,19 +14,19 @@
     Building,
     MoreVertical
   } from 'lucide-react';
-  import AdminLayout from '../../../components/admin/AdminLayout';
-  import { ProtectedRoute } from '../../../components/admin/ProtectedRoute';
-  import EventModal from '../../../components/admin/EventModal';
-  import SchoolBuildingModal from '../../../components/admin/SchoolBuildingModal';
-  import SuccessStoryModal from '../../../components/admin/SuccessStoryModal';
-  import ProgramModal from '../../../components/admin/ProgramModal';
-  import { useAdminApi } from '../../../hooks/useAdminApi';
+  import AdminLayout from '../../../components/admin/AdminLayout.js';
+import { ProtectedRoute } from '../../../components/admin/ProtectedRoute.js';
+import EventModal from '../../../components/admin/EventModal.js';
+import SchoolBuildingModal from '../../../components/admin/SchoolBuildingModal.js';
+import SuccessStoryModal from '../../../components/admin/SuccessStoryModal.js';
+import ProgramModal from '../../../components/admin/ProgramModal.js';
+import { useAdminApi } from '../../../hooks/useAdminApi.js';
   import { 
     Program, 
     Event, 
     SchoolBuilding, 
     SuccessStory 
-  } from '../../../services/adminApi';
+  } from '../../../services/adminApi.ts';
 
   type TabType = 'programs' | 'events' | 'school-building' | 'success-stories';
 

@@ -1,6 +1,6 @@
 import { renderHook } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { usePerformance } from '../usePerformance';
+import { usePerformance } from '../usePerformance.ts';
 
 describe('usePerformance', () => {
   let mockObserver: any;
