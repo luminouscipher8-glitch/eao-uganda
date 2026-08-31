@@ -6,6 +6,7 @@ dotenv.config();
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabaseSchema = process.env.SUPABASE_SCHEMA || 'public';
 
 // Create Supabase client with service role key for admin operations
 export const supabase = createClient(supabaseUrl!, supabaseServiceKey!, {
@@ -14,7 +15,7 @@ export const supabase = createClient(supabaseUrl!, supabaseServiceKey!, {
     persistSession: false
   },
   db: {
-    schema: 'api'
+    schema: supabaseSchema
   }
 });
 

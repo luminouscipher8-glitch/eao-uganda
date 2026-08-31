@@ -133,12 +133,10 @@ export const useErrorLogger = () => {
         window.gtag('event', 'error_logged', {
           event_category: 'error_logging',
           event_label: `${category}:${severity}`,
-          custom_parameters: {
-            error_id: errorId,
-            error_category: category,
-            error_severity: severity,
-            error_message: errorMessage.substring(0, 100), // Truncate for privacy
-          },
+          error_id: errorId,
+          error_category: category,
+          error_severity: severity,
+          error_message: errorMessage.substring(0, 100), // Truncate for privacy
         });
       }
 

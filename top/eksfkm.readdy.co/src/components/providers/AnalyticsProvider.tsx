@@ -31,23 +31,6 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({
 }) => {
   const analyticsHook = useAnalytics();
 
-  // Track page views on route changes
-  useEffect(() => {
-    const handleRouteChange = () => {
-      analyticsHook.trackPageView(window.location.pathname, document.title);
-    };
-
-    // Track initial page view
-    handleRouteChange();
-
-    // Listen for popstate events (browser back/forward)
-    window.addEventListener('popstate', handleRouteChange);
-
-    return () => {
-      window.removeEventListener('popstate', handleRouteChange);
-    };
-  }, [analyticsHook.trackPageView]);
-
   // Track scroll depth
   useEffect(() => {
     let maxScrollDepth = 0;

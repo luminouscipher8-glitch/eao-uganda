@@ -120,7 +120,7 @@ export declare const db: {
         id: string;
         userId: string | null;
         createdAt: Date;
-        updatedAt: Date;
+        updated_at: Date;
         message: string | null;
         status: import(".prisma/client").$Enums.DonationStatus;
         amount: number;
@@ -145,7 +145,7 @@ export declare const db: {
         id: string;
         userId: string | null;
         createdAt: Date;
-        updatedAt: Date;
+        updated_at: Date;
         message: string | null;
         status: import(".prisma/client").$Enums.DonationStatus;
         amount: number;
@@ -175,7 +175,7 @@ export declare const db: {
             id: string;
             userId: string | null;
             createdAt: Date;
-            updatedAt: Date;
+            updated_at: Date;
             message: string | null;
             status: import(".prisma/client").$Enums.DonationStatus;
             amount: number;
@@ -307,7 +307,7 @@ export declare const db: {
             id: string;
             userId: string | null;
             createdAt: Date;
-            updatedAt: Date;
+            updated_at: Date;
             message: string | null;
             status: import(".prisma/client").$Enums.DonationStatus;
             amount: number;

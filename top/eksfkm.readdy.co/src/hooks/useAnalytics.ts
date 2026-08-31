@@ -1,4 +1,5 @@
 import { useCallback, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 
 // Analytics event types for EAO Uganda
 export interface AnalyticsEvent {
@@ -6,7 +7,7 @@ export interface AnalyticsEvent {
   category: string;
   label?: string;
   value?: number;
-  customParameters?: Record<string, string>;
+  customParameters?: Record<string, string | number>;
 }
 
 // EAO-specific event categories
@@ -25,6 +26,7 @@ export const ANALYTICS_CATEGORIES = {
 export const ANALYTICS_ACTIONS = {
   // Donation events
   DONATION_STARTED: 'donation_started',
+  DONATION_CHECKOUT_STARTED: 'donation_checkout_started',
   DONATION_COMPLETED: 'donation_completed',
   DONATION_FAILED: 'donation_failed',
   AMOUNT_SELECTED: 'amount_selected',
@@ -64,52 +66,38 @@ export const ANALYTICS_ACTIONS = {
 
 // Custom hook for Google Analytics 4
 export const useAnalytics = () => {
+  const location = useLocation();
   const GA4_MEASUREMENT_ID = import.meta.env.VITE_GA4_MEASUREMENT_ID;
-  const GA4_DEV_MEASUREMENT_ID = import.meta.env.VITE_GA4_DEV_MEASUREMENT_ID;
-  const isDevelopment = import.meta.env.DEV;
-
-  // Use development measurement ID if in development mode and available, otherwise use production ID
-  const effectiveMeasurementId = isDevelopment ? (GA4_DEV_MEASUREMENT_ID || 'G-XXXXXXXXXX') : GA4_MEASUREMENT_ID;
+  const isAnalyticsEnabled = Boolean(GA4_MEASUREMENT_ID) && !import.meta.env.DEV;
 
   // Initialize GA4
   useEffect(() => {
-    if (!effectiveMeasurementId) {
-      console.log(
-        '📊 Analytics: GA4 disabled (no measurement ID)'
-      );
+    if (!isAnalyticsEnabled) {
       return;
     }
 
-    // Load gtag script
-    const script = document.createElement('script');
-    script.async = true;
-    script.src = `https://www.googletagmanager.com/gtag/js?id=${effectiveMeasurementId}`;
-    document.head.appendChild(script);
-
-    // Initialize gtag
+    const scriptId = 'ga4-script';
     window.dataLayer = window.dataLayer || [];
     window.gtag = function gtag() {
       window.dataLayer.push(arguments);
     };
 
     window.gtag('js', new Date());
-    window.gtag('config', effectiveMeasurementId, {
-      debug_mode: isDevelopment,
-      custom_map: {
-        custom_parameter_1: 'donation_amount',
-        custom_parameter_2: 'payment_method',
-        custom_parameter_3: 'form_type',
-        custom_parameter_4: 'error_type',
-      },
-    });
+    window.gtag('config', GA4_MEASUREMENT_ID, { send_page_view: false });
 
-    console.log(`📊 Analytics: GA4 initialized (${isDevelopment ? 'development mode' : 'production mode'})`);
-  }, [effectiveMeasurementId, isDevelopment]);
+    if (!document.getElementById(scriptId)) {
+      const script = document.createElement('script');
+      script.id = scriptId;
+      script.async = true;
+      script.src = `https://www.googletagmanager.com/gtag/js?id=${GA4_MEASUREMENT_ID}`;
+      document.head.appendChild(script);
+    }
+  }, [GA4_MEASUREMENT_ID, isAnalyticsEnabled]);
 
   // Track page views
   const trackPageView = useCallback(
     (path: string, title?: string) => {
-      if (!effectiveMeasurementId) return;
+      if (!isAnalyticsEnabled) return;
 
       if (window.gtag) {
         window.gtag('event', 'page_view', {
@@ -118,27 +106,29 @@ export const useAnalytics = () => {
         });
       }
     },
-    [effectiveMeasurementId]
+    [isAnalyticsEnabled]
   );
+
+  // Track every React Router navigation, including Link-based transitions.
+  useEffect(() => {
+    trackPageView(`${location.pathname}${location.search}`, document.title);
+  }, [location.pathname, location.search, trackPageView]);
 
   // Track custom events
   const trackEvent = useCallback(
     (event: AnalyticsEvent) => {
-      if (!effectiveMeasurementId) {
-        console.log('📊 Analytics Event:', event);
-        return;
-      }
+      if (!isAnalyticsEnabled) return;
 
       if (window.gtag) {
         window.gtag('event', event.action, {
           event_category: event.category,
           event_label: event.label,
           value: event.value,
-          custom_parameters: event.customParameters,
+          ...event.customParameters,
         });
       }
     },
-    [effectiveMeasurementId]
+    [isAnalyticsEnabled]
   );
 
   // EAO-specific tracking functions
@@ -148,6 +138,21 @@ export const useAnalytics = () => {
       (amount?: string, paymentMethod?: string) => {
         trackEvent({
           action: ANALYTICS_ACTIONS.DONATION_STARTED,
+          category: ANALYTICS_CATEGORIES.DONATION,
+          label: `Amount: ${amount || 'Not specified'}`,
+          customParameters: {
+            donation_amount: amount || '',
+            payment_method: paymentMethod || '',
+          },
+        });
+      },
+      [trackEvent]
+    ),
+
+    trackDonationCheckoutStarted: useCallback(
+      (amount?: string, paymentMethod?: string) => {
+        trackEvent({
+          action: ANALYTICS_ACTIONS.DONATION_CHECKOUT_STARTED,
           category: ANALYTICS_CATEGORIES.DONATION,
           label: `Amount: ${amount || 'Not specified'}`,
           customParameters: {
@@ -323,7 +328,7 @@ export const useAnalytics = () => {
     trackPageView,
     trackEvent,
     analytics,
-    isAnalyticsEnabled: !!effectiveMeasurementId,
+    isAnalyticsEnabled,
   };
 };
 

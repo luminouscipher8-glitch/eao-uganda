@@ -41,11 +41,11 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom'],
-          router: ['react-router-dom'],
-          i18n: ['i18next', 'react-i18next', 'i18next-browser-languagedetector']
-        }
+        manualChunks(id) {
+  if (id.includes('node_modules')) {
+    return 'vendor';
+  }
+}
       }
     }
   }

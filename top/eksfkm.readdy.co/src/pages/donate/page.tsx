@@ -53,8 +53,8 @@ export default function DonatePage() {
       return;
     }
 
-    // Track donation started
-    analytics.trackDonationStarted(selectedAmount, 'pesapal');
+    // Track checkout intent; completion is recorded only after payment verification.
+    analytics.trackDonationCheckoutStarted(selectedAmount, 'pesapal');
 
     // Show inline loading state
     setIsSubmitting(true);
@@ -78,9 +78,6 @@ export default function DonatePage() {
       const response = await createDonationPayment(paymentData);
 
       if (response.success) {
-        // Track donation completed (redirect initiated)
-        analytics.trackDonationCompleted(selectedAmount, 'pesapal');
-        
         // Redirect to Pesapal payment page
         redirectToPesapal(response.data.redirect_url);
       } else {

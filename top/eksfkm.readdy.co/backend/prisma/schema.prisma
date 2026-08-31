@@ -4,9 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
-
 model auth_users {
   id         String           @id
   email      String
@@ -57,7 +55,7 @@ model Contact {
 }
 
 model Payment {
-  id                 String        @id @default(cuid())
+  id                 String        @id @default(dbgenerated("gen_random_uuid()::text"))
   type               PaymentType
   merchant_reference String        @unique
   tracking_id        String?       @unique
@@ -108,7 +106,7 @@ model Donation {
   payment_method           String?
   is_recurring             Boolean        @default(false)
   createdAt                DateTime       @default(now())
-  updatedAt                DateTime       @updatedAt
+  updated_at               DateTime       @updatedAt
   userId                   String?
   campaignId               String?
   campaign                 Campaign?      @relation(fields: [campaignId], references: [id])

@@ -67,3 +67,49 @@ afterEach(() => {
 afterAll(() => {
   // Cleanup after all tests
 });
+
+// Mock HTMLCanvasElement.getContext for jsdom (fixes image/webp checks in tests)
+if (typeof HTMLCanvasElement !== 'undefined' && !HTMLCanvasElement.prototype.getContext) {
+  Object.defineProperty(HTMLCanvasElement.prototype, 'getContext', {
+    value: function (this: any, _type: string) {
+      // Minimal 2D context mock used by image optimization utilities
+      return {
+        createLinearGradient: () => ({ addColorStop: (_: number, __: string) => {} }),
+        addColorStop: (_: number, __: string) => {},
+        fillRect: (_x: number, _y: number, _w: number, _h: number) => {},
+        fillStyle: undefined,
+        // allow other canvas ops without throwing
+      } as any;
+    },
+    configurable: true,
+  });
+
+  // Provide a simple toDataURL implementation on canvas elements
+  if (!HTMLCanvasElement.prototype.toDataURL) {
+    Object.defineProperty(HTMLCanvasElement.prototype, 'toDataURL', {
+      value: function (this: any, _type?: string, _quality?: number) {
+        // Return a tiny 1x1 JPEG base64 data URL as a placeholder
+        return 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxISEhUTEhIWFRUVFRUVFRUVFRUVFRUWFhUVFRUYHSggGBolGxUVITEhJSkrLi4uFx8zODMsNygtLisBCgoKDg0OGxAQGy0lICUtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLf/AABEIAKgBLAMBIgACEQEDEQH/xAAXAAEBAQEAAAAAAAAAAAAAAAAAAQID/8QAFQEBAQAAAAAAAAAAAAAAAAAAAQL/2gAMAwEAAhADEAAAAP8A/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPwD//8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAgEBPwD//8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAwEBPwD//2Q==';
+      },
+      configurable: true,
+    });
+  }
+}
+
+// Mock PerformanceObserver for environments without it (Vitest + JSDOM)
+if (typeof (globalThis as any).PerformanceObserver === 'undefined') {
+  // Use a function constructor so tests that spy/mocking expect a constructor work
+  function MockPerformanceObserver(this: any, cb: any) {
+    this.callback = cb;
+  }
+  MockPerformanceObserver.prototype.observe = function () {
+    return null;
+  };
+  MockPerformanceObserver.prototype.disconnect = function () {
+    return null;
+  };
+  MockPerformanceObserver.prototype.takeRecords = function () {
+    return [];
+  };
+  (globalThis as any).PerformanceObserver = MockPerformanceObserver as any;
+}

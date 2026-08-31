@@ -12,6 +12,11 @@ export interface PesapalPaymentRequest {
   redirect_url: string;
   description: string;
   reference: string;
+  billing_address?: string;
+  billing_city?: string;
+  billing_state?: string;
+  billing_post_code?: string;
+  billing_country?: string;
 }
 
 export interface PesapalTransactionResponse {
@@ -95,88 +100,53 @@ class PesapalService {
   /**
    * Submit payment request to Pesapal
    */
-  async submitPayment(paymentData: PesapalPaymentRequest): Promise<PesapalTransactionResponse> {
+async submitPayment(paymentData: PesapalPaymentRequest): Promise<PesapalTransactionResponse> {
     try {
       const token = await this.getAccessToken();
 
-      // Use only an explicitly configured notification id from env.
-      // Do NOT attempt runtime registration here — dynamic IPN IDs from tunnels
-      // are often rejected by Pesapal sandbox. If you need to register an IPN
-      // programmatically, call `registerIPN()` manually and store the stable id
-      // in `PESAPAL_IPN_ID`.
-      const notificationId = process.env.PESAPAL_IPN_ID || null;
+      const notificationId = process.env.PESAPAL_NOTIFICATION_ID;
+      if (!notificationId) {
+        throw new Error("Missing PESAPAL_NOTIFICATION_ID in environment variables");
+      }
 
-      const payload: any = {
+      const payload = {
         id: paymentData.reference,
         currency: paymentData.currency,
-        amount: paymentData.amount,
-        email: paymentData.email,
-        phone_number: paymentData.phone_number,
-        first_name: paymentData.first_name,
-        last_name: paymentData.last_name,
+        amount: Number(paymentData.amount),
         description: paymentData.description,
         callback_url: paymentData.callback_url,
         redirect_url: paymentData.redirect_url,
-
-        // Start minimal; add optional fields after it works:
-        // include notification_mode only when a notification id is present
-        // to avoid sandbox validation errors
-        // notification_mode: 'CALLBACK',
-        brand_name: 'Educate an Orphan Uganda',
-        language: 'en',
+        notification_id: notificationId,
+        billing_address: {
+          email_address: paymentData.email,
+          phone_number: paymentData.phone_number || '',
+          first_name: paymentData.first_name,
+          last_name: paymentData.last_name,
+          country_code: paymentData.billing_country || 'UG',
+          city: paymentData.billing_city || 'Kampala',
+          line_1: paymentData.billing_address || 'N/A',
+          state: paymentData.billing_state || '',
+          postal_code: paymentData.billing_post_code || ''
+        }
       };
 
-      // Pesapal sometimes requires billing details — include minimal placeholders
-      payload.billing_address = paymentData['billing_address'] || 'N/A';
-      payload.billing_city = paymentData['billing_city'] || 'Kampala';
-      payload.billing_state = paymentData['billing_state'] || '';
-      payload.billing_post_code = paymentData['billing_post_code'] || '';
-      payload.billing_country = paymentData['billing_country'] || 'UG';
+      const response = await axios.post(`${this.baseUrl}/api/Transactions/SubmitOrderRequest`, payload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+      });
 
-      // Intentionally do not include `notification_id` or `notification_mode`
-      // in the SubmitOrderRequest to avoid sandbox validation issues.
-
-      try {
-        const response = await axios.post(`${this.baseUrl}/api/Transactions/SubmitOrderRequest`, payload, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        });
-
-        // Pesapal sometimes returns a 200 with an error object inside the body.
-        if (response.data && response.data.error) {
-          const msg = response.data.error.message || JSON.stringify(response.data.error);
-          const e: any = new Error(msg || 'Pesapal reported an error in response');
-          e.details = response.data;
-          e.status = response.data.status || 502;
-          throw e;
-        }
-
-        return response.data;
-      } catch (submitErr) {
-        const serr = submitErr as AxiosError<any>;
-        const message = serr.response?.data?.error?.message || serr.response?.data?.message || '';
-
-        // If Pesapal complains about the IPN/notification id, retry without notification fields.
-        if (message && message.toLowerCase().includes('ipn')) {
-          console.warn('Pesapal rejected notification_id; retrying SubmitOrderRequest without IPN fields');
-          // Remove IPN related fields and retry once
-          delete payload.notification_id;
-          delete payload.notification_mode;
-
-          const retryResp = await axios.post(`${this.baseUrl}/api/Transactions/SubmitOrderRequest`, payload, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            },
-          });
-
-          return retryResp.data;
-        }
-
-        throw submitErr;
+      if (response.data && response.data.error) {
+        const msg = response.data.error.message || JSON.stringify(response.data.error);
+        const e: any = new Error(msg || 'Pesapal reported an error in response');
+        e.details = response.data;
+        e.status = response.data.status || 502;
+        throw e;
       }
+
+      return response.data;
     } catch (error) {
       const err = error as AxiosError<any>;
 
@@ -187,7 +157,7 @@ class PesapalService {
       });
 
       const e: any = new Error(
-        err.response?.data?.message || "Failed to create payment with Pesapal"
+        err.response?.data?.message || err.response?.data?.error?.message || "Failed to create payment with Pesapal"
       );
       e.status = err.response?.status || 502;
       e.details = err.response?.data;

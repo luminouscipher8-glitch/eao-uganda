@@ -1,8 +1,6 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import fetch from 'node-fetch';
-
 async function main() {
   const url = process.env.BACKEND_URL || 'http://localhost:3001';
   const endpoint = `${url}/api/payments/donations/create`;
@@ -12,7 +10,7 @@ async function main() {
   const body = {
     amount: 1500,
     donorName: 'Automated Test',
-    donorEmail: process.env.TEST_DONOR_EMAIL || 'donor@example.com',
+    donorEmail: process.env.TEST_DONOR_EMAIL || 'luminouscipher8@gmail.com',
     donorPhone: '256700000000',
     message: 'Donation test',
     currency: 'UGX'
@@ -26,7 +24,11 @@ async function main() {
     });
 
     const text = await res.text();
-    try { console.log('Response:', JSON.parse(text)); } catch { console.log('Response text:', text); }
+    try { 
+      console.log('Response:', JSON.parse(text)); 
+    } catch { 
+      console.log('Response text:', text); 
+    }
   } catch (err) {
     console.error('Request failed:', err);
     process.exitCode = 2;
