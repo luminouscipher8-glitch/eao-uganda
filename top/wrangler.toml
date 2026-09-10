@@ -4,25 +4,18 @@ compatibility_date = "2024-01-24"
 compatibility_flags = ["nodejs_compat"]
 
 # Pages configuration (for direct wrangler deployment)
-pages_build_output_dir = "top/eksfkm.readdy.co/dist"
+pages_build_output_dir = "eksfkm.readdy.co/dist"
 
-# Environment variables for Workers/Pages
+# Environment variables must be configured in the Cloudflare dashboard or via `wrangler secret put`.
+# Do not commit live values here.
 [vars]
-VITE_SUPABASE_URL = "https://db.https://merrqcqxvqvwfuohlxbs.supabase.co"
-VITE_SUPABASE_ANON_KEY = "sb_publishable_5707Wm_xn45TSDx1haQyqg_hs71FryT"
-VITE_API_URL = "https://eao-uganda.onrender.com"
+NODE_ENV = "production"
 
-# Production-specific variables
 [env.production.vars]
-VITE_SUPABASE_URL = "https://db.https://merrqcqxvqvwfuohlxbs.supabase.co"
-VITE_SUPABASE_ANON_KEY = "sb_publishable_5707Wm_xn45TSDx1haQyqg_hs71FryT"
-VITE_API_URL = "https://eao-uganda.onrender.com"
+NODE_ENV = "production"
 
-# Preview-specific variables
 [env.preview.vars]
-VITE_SUPABASE_URL = "https://db.https://merrqcqxvqvwfuohlxbs.supabase.co"
-VITE_SUPABASE_ANON_KEY = "sb_publishable_5707Wm_xn45TSDx1haQyqg_hs71FryT"
-VITE_API_URL = "https://eao-uganda.onrender.com"
+NODE_ENV = "preview"
 
 # KV namespace for caching (optional - comment out if not using)
 # [[kv_namespaces]]
@@ -32,4 +25,4 @@ VITE_API_URL = "https://eao-uganda.onrender.com"
 
 # Build command for Cloudflare Pages
 [build]
-command = "cd top/eksfkm.readdy.co && rm -rf node_modules package-lock.json && npm install && npm run build"
+command = "cd eksfkm.readdy.co && npm ci --include=dev && npm run build"

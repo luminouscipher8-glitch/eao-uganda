@@ -2,7 +2,7 @@
 # Production-ready NGO web platform
 
 [build]
-  base = "top/eksfkm.readdy.co"
+  base = "eksfkm.readdy.co"
   publish = "dist"
   command = "npm run build"
 
@@ -85,16 +85,13 @@
 [functions]
   directory = "netlify/functions"
 
-# Environment variables for production
+# Environment variables for production are configured in the Netlify Dashboard.
+# Keep secret values there instead of committing them to the repo.
 [context.production.environment]
-  VITE_SUPABASE_URL = "https://db.https://merrqcqxvqvwfuohlxbs.supabase.co"
-  VITE_SUPABASE_ANON_KEY = "sb_publishable_5707Wm_xn45TSDx1haQyqg_hs71FryT"
-  VITE_API_URL = "https://eao-uganda.onrender.com"
+  NODE_ENV = "production"
 
 [context.deploy-preview.environment]
-  VITE_SUPABASE_URL = "https://db.https://merrqcqxvqvwfuohlxbs.supabase.co"
-  VITE_SUPABASE_ANON_KEY = "sb_publishable_5707Wm_xn45TSDx1haQyqg_hs71FryT"
-  VITE_API_URL = "https://eao-uganda.onrender.com"
+  NODE_ENV = "preview"
 
 # Edge functions for better performance
 [[edge_functions]]

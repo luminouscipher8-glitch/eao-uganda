@@ -1,1 +1,25 @@
+# Root project dependencies
 node_modules
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+**/*.local
+**/*.pem
+**/*.key
+
+# Generated/build output
+/dist
+/build
+coverage
+.vite
+.cache
+
+# Editor and OS artifacts
+.vscode/
+.DS_Store
+Thumbs.db
